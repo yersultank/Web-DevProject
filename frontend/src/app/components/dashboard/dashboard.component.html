@@ -1,0 +1,17 @@
+<div class="container">
+  <h2>Welcome, {{ userName }}</h2>
+
+  @if (userRole === 'admin') {
+    <div class="admin-panel">
+      <button>+ Add New Asset</button>
+      <button>Manage Users</button>
+    </div>
+  }
+
+  <h3>Asset List</h3>
+  <ul>
+    @for (item of assets; track item.id) {
+      <li>{{ item.name }} — <b>{{ item.status }}</b></li>
+    }
+  </ul>
+</div>
