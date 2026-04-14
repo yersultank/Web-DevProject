@@ -3,15 +3,30 @@
 
   @if (userRole === 'admin') {
     <div class="admin-panel">
-      <button>+ Add New Asset</button>
+      <button (click)="toggleAddForm()">+ Add New Asset</button>
       <button>Manage Users</button>
+
+      @if (showAddForm) {
+        <div class="add-form">
+          <input [(ngModel)]="newAssetName" placeholder="Asset name">
+          <select [(ngModel)]="newAssetStatus">
+            <option value="Available">Available</option>
+            <option value="In Use">In Use</option>
+            <option value="Repair">Repair</option>
+          </select>
+          <button (click)="addAsset()" class="save-btn">Save</button>
+        </div>
+      }
     </div>
   }
 
   <h3>Asset List</h3>
   <ul>
     @for (item of assets; track item.id) {
-      <li>{{ item.name }} — <b>{{ item.status }}</b></li>
+      <li>
+        {{ item.name }} — <b>{{ item.status }}</b>
+        <button (click)="deleteAsset(item.id)" class="del-btn">Delete</button>
+      </li>
     }
   </ul>
 </div>
