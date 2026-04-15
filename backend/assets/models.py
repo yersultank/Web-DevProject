@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -28,3 +31,42 @@ class Asset(models.Model):
 
 	def __str__(self) -> str:
 		return f'{self.name} ({self.serial_number})'
+
+
+class Assignment(models.Model):
+	asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='assignments')
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='asset_assignments')
+	assigned_at = models.DateTimeField(default=timezone.now)
+	returned_at = models.DateTimeField(null=True, blank=True)
+	notes = models.TextField(blank=True)
+
+	class Meta:
+		ordering = ('-assigned_at',)
+		constraints = [
+			models.UniqueConstraint(
+				fields=('asset',),
+				condition=Q(returned_at__isnull=True),
+				name='unique_active_assignment_per_asset',
+			),
+		]
+
+	def __str__(self) -> str:
+		return f'{self.asset.serial_number} -> {self.user.username}'
+
+
+class ConditionReport(models.Model):
+	class Condition(models.TextChoices):
+		GOOD = 'good', 'Good'
+		DAMAGED = 'damaged', 'Damaged'
+		LOST = 'lost', 'Lost'
+
+	asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='condition_reports')
+	condition = models.CharField(max_length=20, choices=Condition.choices)
+	note = models.TextField(blank=True)
+	report_date = models.DateTimeField(default=timezone.now)
+
+	class Meta:
+		ordering = ('-report_date',)
+
+	def __str__(self) -> str:
+		return f'{self.asset.serial_number} - {self.condition}'
