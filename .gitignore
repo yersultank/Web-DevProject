@@ -31,3 +31,4 @@ frontend/.angular/
 .DS_Store
 .vscode/
 *.swp
+.copilot-instructions.md
