@@ -1,0 +1,28 @@
+<div class="landing-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+
+  <main class="shell">
+    <header class="hero">
+      <span class="eyebrow">Asset Platform</span>
+      <h1>AssetTrack</h1>
+      <p>Manage your organization's assets in one place</p>
+
+      <!-- Defense note: *ngIf shows this banner only when a token already exists in localStorage. -->
+      <div class="logged-banner" *ngIf="isLoggedIn">Already logged in</div>
+
+      <a class="cta" routerLink="/login">Get Started</a>
+    </header>
+
+    <section class="features" aria-label="Core features">
+      <!-- Defense note: *ngFor renders one card per item from the TypeScript features array. -->
+      <article class="feature-card" *ngFor="let feature of features; let i = index">
+        <span class="card-number">0{{ i + 1 }}</span>
+        <h2>{{ feature.title }}</h2>
+        <p>{{ feature.description }}</p>
+      </article>
+    </section>
+
+    <footer class="footer">AssetTrack © 2026</footer>
+  </main>
+</div>
