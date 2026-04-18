@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.angular/
+*.spec.ts
+*.md
+backend/
+*.json
+__pycache__/
+*.py
+*.pyc
+venv/
