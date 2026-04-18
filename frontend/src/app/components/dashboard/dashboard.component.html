@@ -21,12 +21,24 @@
   }
 
   <h3>Asset List</h3>
-  <ul>
-    @for (item of assets; track item.id) {
-      <li>
-        {{ item.name }} — <b>{{ item.status }}</b>
-        <button (click)="deleteAsset(item.id)" class="del-btn">Delete</button>
-      </li>
-    }
-  </ul>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading assets...</span>
+    </div>
+  } @else if (loadError) {
+    <p class="error-message">{{ loadError }}</p>
+  } @else {
+    <ul>
+      @for (item of assets; track item.id) {
+        <li>
+          {{ item.name }} — <b>{{ item.status }}</b>
+          <button (click)="deleteAsset(item.id)" class="del-btn">Delete</button>
+        </li>
+      } @empty {
+        <li>No assets found.</li>
+      }
+    </ul>
+  }
 </div>

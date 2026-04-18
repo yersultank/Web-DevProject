@@ -1,1 +1,37 @@
-<p>login works!</p>
+<div class="login-container">
+	<div class="login-card">
+		<h2>Internal Asset Tracker</h2>
+		<p>Please enter your credentials</p>
+
+		<form (ngSubmit)="onLogin()">
+			<div class="form-group">
+				<input type="text" [(ngModel)]="loginData.username" name="username" placeholder="Username" required>
+			</div>
+
+			<div class="form-group">
+				<input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required>
+			</div>
+
+			<div class="form-group">
+				<input type="text" [(ngModel)]="loginData.branchCode" name="branch" placeholder="Branch Code (e.g. KBTU-01)">
+			</div>
+
+			<div class="form-group">
+				<label>
+					<input type="checkbox" [(ngModel)]="loginData.remember" name="remember">
+					Remember this device
+				</label>
+			</div>
+
+			<button type="submit" [disabled]="loading">
+				{{ loading ? 'Logging in...' : 'Sign In' }}
+			</button>
+		</form>
+
+		@if (errorMessage) {
+			<div class="error-message">
+				{{ errorMessage }}
+			</div>
+		}
+	</div>
+</div>

@@ -7,6 +7,9 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+/**
+ * Root shell component that hosts the application router outlet.
+ */
 export class App {
   protected readonly title = signal('frontend');
 }
