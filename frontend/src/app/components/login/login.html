@@ -1,37 +1,44 @@
 <div class="login-container">
-	<div class="login-card">
-		<h2>Internal Asset Tracker</h2>
-		<p>Please enter your credentials</p>
+    <div class="login-card">
+        <div class="logo-icon">🏠</div>
+        
+        <h2>{{ isLoginMode ? 'AssetTrack' : 'Join AssetTrack' }}</h2>
+        <p>{{ isLoginMode ? 'Please enter your credentials' : 'Create a new staff account' }}</p>
 
-		<form (ngSubmit)="onLogin()">
-			<div class="form-group">
-				<input type="text" [(ngModel)]="loginData.username" name="username" placeholder="Username" required>
-			</div>
+        <form (ngSubmit)="onLogin()">
+            <div class="form-group">
+                <input type="text" [(ngModel)]="loginData.username" name="username" placeholder="Username" required>
+            </div>
 
-			<div class="form-group">
-				<input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required>
-			</div>
+            <div class="form-group">
+                <input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required>
+            </div>
 
-			<div class="form-group">
-				<input type="text" [(ngModel)]="loginData.branchCode" name="branch" placeholder="Branch Code (e.g. KBTU-01)">
-			</div>
+            <div class="form-group row">
+                <label class="checkbox-label">
+                    <input type="checkbox" [(ngModel)]="loginData.remember" name="remember">
+                    <span>Remember this device</span>
+                </label>
+            </div>
 
-			<div class="form-group">
-				<label>
-					<input type="checkbox" [(ngModel)]="loginData.remember" name="remember">
-					Remember this device
-				</label>
-			</div>
+            <button type="submit" [disabled]="loading" class="btn-primary">
+                {{ loading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Create Account') }}
+            </button>
+        </form>
 
-			<button type="submit" [disabled]="loading">
-				{{ loading ? 'Logging in...' : 'Sign In' }}
-			</button>
-		</form>
+        <div class="toggle-mode">
+            <p>
+                {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+                <span class="toggle-link" (click)="toggleMode()">
+                    {{ isLoginMode ? 'Sign Up' : 'Login' }}
+                </span>
+            </p>
+        </div>
 
-		@if (errorMessage) {
-			<div class="error-message">
-				{{ errorMessage }}
-			</div>
-		}
-	</div>
+        @if (errorMessage) {
+            <div class="error-message">
+                {{ errorMessage }}
+            </div>
+        }
+    </div>
 </div>

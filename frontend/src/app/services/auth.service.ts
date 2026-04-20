@@ -23,10 +23,16 @@ export class AuthService {
       .pipe(
         tap(res => {
           localStorage.setItem('access_token', res.access);
+          if (res.refresh) {
+            localStorage.setItem('refresh_token', res.refresh);
+          }
         })
       );
   }
 
+  register(credentials: LoginCredentials): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register/`, credentials);
+  }
   /**
    * Fetches the admin asset list.
    */
@@ -39,6 +45,7 @@ export class AuthService {
    */
   logout(): void {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
   }
 
   /**
