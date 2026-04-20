@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-
+from django.contrib.auth.models import User
 from .models import Asset, Assignment, Category, ConditionReport
 from .serializers import (
 	AssetDetailSerializer,
@@ -16,6 +16,7 @@ from .serializers import (
 	DashboardStatsSerializer,
 	LogoutSerializer,
 	MyAssetSerializer,
+	UserRegisterSerializer,
 )
 
 
@@ -111,3 +112,8 @@ class DashboardStatsView(APIView):
 
 		serializer = DashboardStatsSerializer(payload)
 		return Response(serializer.data, status=status.HTTP_200_OK)
+
+class RegisterView(viewsets.generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [permissions.AllowAny]

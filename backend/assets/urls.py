@@ -11,6 +11,7 @@ from .views import (
     LoginView,
     LogoutView,
     MyAssetsView,
+    RegisterView,
 )
 
 router = DefaultRouter()
@@ -26,4 +27,5 @@ urlpatterns = [
     path('my-assets/', MyAssetsView.as_view(), name='my_assets'),
     path('assignments/', AssignmentCreateView.as_view(), name='assignment_create'),
     path('', include(router.urls)),
+    path('register/', RegisterView.as_view(), name='register'),
 ]
