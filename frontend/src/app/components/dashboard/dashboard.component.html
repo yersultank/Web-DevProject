@@ -1,6 +1,6 @@
 <div class="dashboard">
 
-  <!-- ── Sidebar  -->
+  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <span class="logo-icon">◈</span>
@@ -23,7 +23,7 @@
     </div>
   </aside>
 
-  <!-- ── Main  -->
+  <!-- ── Main ── -->
   <main class="main">
 
     <!-- Topbar -->
@@ -33,8 +33,8 @@
         <p class="topbar-sub">{{ filteredAssets.length }} of {{ assets.length }} assets</p>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" (click)="loadAssets()" [disabled]="isLoading">
-          <span [class.spin]="isLoading">↻</span> Refresh
+        <button class="btn btn-ghost" (click)="loadAssets()">
+          ↻ Refresh
         </button>
         @if (userRole === 'admin') {
           <button class="btn btn-primary" (click)="toggleAddForm()">
@@ -52,7 +52,7 @@
       </div>
     }
 
-    <!-- ── Add Form ───────────────────────────────────────────────────────── -->
+    <!-- ── Add Form ── -->
     @if (showAddForm) {
       <section class="glass-card form-card">
         <h2 class="form-title">New Asset</h2>
@@ -87,7 +87,6 @@
             </select>
           </div>
 
-          <!-- Description -->
           <div class="form-field form-field-full">
             <label>Description</label>
             <textarea [(ngModel)]="newAssetDescription" rows="2" placeholder="Optional description…"></textarea>
@@ -110,7 +109,7 @@
       </section>
     }
 
-    <!-- ── Edit Form  -->
+    <!-- ── Edit Form ── -->
     @if (editingAsset) {
       <section class="glass-card form-card edit-form">
         <h2 class="form-title">Edit Asset #{{ editingAsset.id }}</h2>
@@ -162,7 +161,7 @@
       </section>
     }
 
-    <!-- ── Filters  -->
+    <!-- ── Filters ── -->
     <section class="filters-bar glass-card">
       <input class="filter-search" [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()"
              placeholder="🔍  Search by name or serial…" />
@@ -173,87 +172,66 @@
         }
       </select>
       <select class="filter-select" [(ngModel)]="filterCategoryId" (ngModelChange)="onFilterChange()">
-        <option [value]="null">All Categories</option>
+        <option value="">All Categories</option>
         @for (c of categories; track c.id) {
           <option [value]="c.id">{{ c.name }}</option>
         }
       </select>
     </section>
 
-    <!-- ── Grid / Skeleton (@if/@else) ──────────── -->
-    @if (isLoading) {
-      <div class="skeleton-grid">
-        @for (n of [1,2,3,4,5,6]; track n) {
-          <div class="skeleton-card">
-            <div class="skeleton-img"></div>
-            <div class="skeleton-body">
-              <div class="skeleton-line w60"></div>
-              <div class="skeleton-line w40"></div>
-              <div class="skeleton-line w80"></div>
-            </div>
-          </div>
+    <!-- ── Asset Grid ── -->
+    @if (filteredAssets.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">◈</div>
+        @if (assets.length > 0) {
+          <p>No assets match your filters.</p>
+          <p class="empty-sub">Try adjusting your search or filters.</p>
+        } @else {
+          <p>No assets yet.</p>
+          <p class="empty-sub">Click "+ Add Asset" to get started.</p>
         }
       </div>
     } @else {
+      <div class="asset-grid">
+        @for (asset of filteredAssets; track asset.id) {
+          <article class="asset-card glass-card">
 
-      @if (filteredAssets.length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">◈</div>
-          <p>No assets found.</p>
-          @if (assets.length > 0) {
-            <p class="empty-sub">Try adjusting your filters.</p>
-          } @else {
-            <p class="empty-sub">Click "+ Add Asset" to get started.</p>
-          }
-        </div>
+            <div class="asset-img-wrap">
+              <img
+                class="asset-img"
+                [src]="getAssetImage(asset)"
+                [alt]="asset.name"
+                loading="lazy"
+              />
+              <span class="asset-status-badge" [attr.data-status]="asset.status">
+                {{ asset.status | titlecase }}
+              </span>
+            </div>
 
-      } @else {
-
-        <div class="asset-grid">
-          @for (asset of filteredAssets; track asset.id) {
-            <article class="asset-card glass-card">
-
-              <!-- Photo (your own from Django or a fallback by category) -->
-              <div class="asset-img-wrap">
-                <img
-                  class="asset-img"
-                  [src]="getAssetImage(asset)"
-                  [alt]="asset.name"
-                  loading="lazy"
-                />
-                <span class="asset-status-badge" [attr.data-status]="asset.status">
-                  {{ asset.status | titlecase }}
-                </span>
+            <div class="asset-content">
+              <div class="asset-meta">
+                <span class="asset-category">{{ getCategoryName(asset) }}</span>
+                <span class="asset-id">#{{ asset.id }}</span>
               </div>
+              <h3 class="asset-name">{{ asset.name }}</h3>
+              <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
+              @if (asset.description) {
+                <p class="asset-description">{{ asset.description }}</p>
+              }
+            </div>
 
-              <!-- Content -->
-              <div class="asset-content">
-                <div class="asset-meta">
-                  <span class="asset-category">{{ getCategoryName(asset) }}</span>
-                  <span class="asset-id">#{{ asset.id }}</span>
-                </div>
-                <h3 class="asset-name">{{ asset.name }}</h3>
-                <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
-                @if (asset.description) {
-                  <p class="asset-description">{{ asset.description }}</p>
-                }
-              </div>
+            <div class="asset-footer">
+              <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">
+                ✎ Edit
+              </button>
+              <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">
+                ✕
+              </button>
+            </div>
 
-              <!-- Buttons -->
-              <div class="asset-footer">
-                <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">
-                  ✎ Edit
-                </button>
-                <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">
-                  ✕
-                </button>
-              </div>
-
-            </article>
-          }
-        </div>
-
-      }
+          </article>
+        }
+      </div>
     }
 
   </main>
