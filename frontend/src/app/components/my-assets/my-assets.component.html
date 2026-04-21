@@ -1,0 +1,66 @@
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">AssetOS</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active"><span class="nav-icon">◎</span> My Assets</a>
+      <a class="nav-item" (click)="goToProfile()" style="cursor:pointer">
+        <span class="nav-icon">⬟</span> My Profile
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>My <span class="title-accent">Assets</span></h1>
+        <p class="topbar-sub">{{ assets.length }} assigned to you</p>
+      </div>
+      <button class="btn btn-ghost" (click)="loadMyAssets()">↻ Refresh</button>
+    </header>
+
+    @if (error) {
+      <div class="alert alert-error">⚠ {{ error }}</div>
+    }
+
+    @if (assets.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">◈</div>
+        <p>No assets assigned to you.</p>
+      </div>
+    } @else {
+      <div class="asset-grid">
+        @for (asset of assets; track asset.asset_id) {
+          <article class="asset-card glass-card">
+            <div class="asset-img-wrap">
+              <img class="asset-img" [src]="getImage(asset)" [alt]="asset.asset_name" loading="lazy" />
+              <span class="asset-status-badge" [attr.data-status]="asset.status">
+                {{ asset.status | titlecase }}
+              </span>
+            </div>
+            <div class="asset-content">
+              <div class="asset-meta">
+                <span class="asset-category">{{ asset.category_name }}</span>
+                <span class="asset-id">#{{ asset.asset_id }}</span>
+              </div>
+              <h3 class="asset-name">{{ asset.asset_name }}</h3>
+              <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
+              @if (asset.description) {
+                <p class="asset-description">{{ asset.description }}</p>
+              }
+              <p class="asset-date">Assigned: {{ asset.assigned_at | date:'mediumDate' }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+  </main>
+</div>
