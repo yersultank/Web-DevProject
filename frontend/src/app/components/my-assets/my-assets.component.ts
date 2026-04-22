@@ -20,15 +20,27 @@ export class MyAssetsComponent implements OnInit {
   emptyOptions: AnimationOptions = { path: 'assets/animations/empty_state.json' };
   readonly baseUrl = 'http://127.0.0.1:8000';
 
-  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  ngOnInit(): void { this.loadMyAssets(); }
+  ngOnInit(): void {
+    this.loadMyAssets();
+  }
 
   loadMyAssets(): void {
     this.error = '';
     this.authService.getMyAssets().subscribe({
-      next:  data => { this.assets = data; this.cdr.detectChanges(); },
-      error: ()   => { this.error = 'Could not load your assets.'; this.cdr.detectChanges(); },
+      next: (data) => {
+        this.assets = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Could not load your assets.';
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -49,7 +61,9 @@ export class MyAssetsComponent implements OnInit {
     });
   }
 
-  goToProfile(): void { this.router.navigate(['/profile']); }
+  goToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
 
   logout(): void {
     this.authService.logout();
