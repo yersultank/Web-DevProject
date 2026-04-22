@@ -1,9 +1,20 @@
-html, body {
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #0b111b; 
-  font-family: 'Inter', sans-serif; 
+  background-color: #1f1633;
+  color: #ffffff;
+  font-family:
+    'Rubik',
+    -apple-system,
+    system-ui,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif;
   overflow-x: hidden;
 }
 
@@ -11,9 +22,9 @@ html, body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #151c27;
+  background: #150f23;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2d3748;
+  background: #362d59;
   border-radius: 4px;
 }

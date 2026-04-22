@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Asset, Assignment, Category, ConditionReport
+from .models import Asset, Assignment, Category, ConditionReport, UserProfile
 
 
 class AssetApiTests(APITestCase):
@@ -118,3 +118,25 @@ class AssetApiTests(APITestCase):
 		self.assertEqual(stats_response.status_code, status.HTTP_200_OK)
 		self.assertEqual(stats_response.data['total'], 1)
 		self.assertEqual(stats_response.data['assigned'], 1)
+
+	def test_user_can_update_own_profile(self):
+		token = self._login_and_get_access('employee', 'employeepass123')
+		self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+		response = self.client.patch(
+			reverse('my_profile'),
+			{
+				'department': 'Engineering',
+				'position': 'QA Analyst',
+				'phone': '+7 777 000 11 22',
+				'office_address': 'A-204',
+			},
+			format='json',
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		self.assertEqual(response.data['department'], 'Engineering')
+
+		profile = UserProfile.objects.get(user=self.employee_user)
+		self.assertEqual(profile.position, 'QA Analyst')
+		self.assertEqual(profile.phone, '+7 777 000 11 22')

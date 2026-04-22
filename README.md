@@ -4,6 +4,7 @@ A full-stack web application for tracking, managing, and assigning company asset
 
 ---
 
+<<<<<<< HEAD
 ## 👥 Team Members
 
 | Name | Role |
@@ -16,6 +17,10 @@ A full-stack web application for tracking, managing, and assigning company asset
 
 - Yersultan (yersultank)
 - abnzrdev
+=======
+- Yersultan
+- Abenezer Alemayehu
+>>>>>>> d5f1347 (chore: commit local changes before merging chore/harden-startup-readme-postman into main)
 
 ---
 
