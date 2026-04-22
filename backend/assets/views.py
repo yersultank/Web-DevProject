@@ -1,25 +1,27 @@
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 from .models import Asset, Assignment, Category, ConditionReport, UserProfile
 from .serializers import (
-    AssetDetailSerializer, AssetSerializer,
-    AssignmentCreateSerializer, AuthTokenObtainPairSerializer,
+    AssetSerializer, AssetDetailSerializer,
+    AssignmentCreateSerializer, AssignmentHistorySerializer,
+    AuthTokenObtainPairSerializer,
     CategorySerializer, ConditionReportSerializer,
     DashboardStatsSerializer, LogoutSerializer,
-    MyAssetSerializer, UserRegisterSerializer,
+    MyAssetSerializer,
     UserProfileSerializer, UserProfileAdminSerializer,
+    UserRegisterSerializer,
 )
 
-
-# ── CBV ───────────────────────────────────────────────────────────────────────
 
 class LoginView(TokenObtainPairView):
     permission_classes = [permissions.AllowAny]
@@ -35,8 +37,8 @@ class LogoutView(APIView):
         try:
             RefreshToken(serializer.validated_data['refresh']).blacklist()
         except TokenError:
-            return Response({'detail': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'detail': 'Logout successful.'})
+            return Response({'detail': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Logged out successfully.'})
 
 
 class AssetViewSet(viewsets.ModelViewSet):
@@ -46,12 +48,24 @@ class AssetViewSet(viewsets.ModelViewSet):
         .prefetch_related('assignments__user', 'condition_reports')
         .order_by('id')
     )
-    serializer_class = AssetSerializer
     permission_classes = [permissions.IsAdminUser]
     parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
     def get_serializer_class(self):
         return AssetDetailSerializer if self.action == 'retrieve' else AssetSerializer
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        instance = self.get_object()
+        old_status = instance.status
+
+        response = super().update(request, *args, **kwargs)
+
+        instance.refresh_from_db()
+        if old_status == Asset.Status.ASSIGNED and instance.status != Asset.Status.ASSIGNED:
+            instance.close_active_assignments()
+
+        return response
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -73,9 +87,30 @@ class AssignmentCreateView(APIView):
         serializer = AssignmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save()
-        assignment.asset.status = Asset.Status.ASSIGNED
-        assignment.asset.save(update_fields=['status', 'updated_at'])
-        return Response(AssignmentCreateSerializer(assignment).data, status=status.HTTP_201_CREATED)
+        return Response(
+            AssignmentHistorySerializer(assignment).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ReturnAssetView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, assignment_id):
+        assignment = get_object_or_404(
+            Assignment,
+            pk=assignment_id,
+            user=request.user,
+            returned_at__isnull=True,
+        )
+        assignment.returned_at = timezone.now()
+        assignment.save(update_fields=['returned_at'])
+
+        asset = assignment.asset
+        asset.status = Asset.Status.AVAILABLE
+        asset.save(update_fields=['status', 'updated_at'])
+
+        return Response({'detail': 'Asset returned successfully.'}, status=status.HTTP_200_OK)
 
 
 class MyAssetsView(APIView):
@@ -106,33 +141,44 @@ class DashboardStatsView(APIView):
         return Response(DashboardStatsSerializer(payload).data)
 
 
-class RegisterView(viewsets.generics.CreateAPIView):
+class RegisterView(generics.CreateAPIView):
     queryset           = User.objects.all()
     serializer_class   = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
 
 
-# ── FBV 1: собственный профиль (GET = просмотр, PUT = редактирование) ─────────
 @api_view(['GET', 'PUT'])
 @permission_classes([permissions.IsAuthenticated])
 def my_profile(request):
-    # get_or_create — создаёт профиль если его ещё нет, привязывает к request.user
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'GET':
         return Response(UserProfileSerializer(profile).data)
 
-    # PUT — обновляем только переданные поля (partial=True)
     serializer = UserProfileSerializer(profile, data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data)
 
 
-# ── FBV 2: профиль пользователя для администратора (с его ассетами) ──────────
 @api_view(['GET'])
 @permission_classes([permissions.IsAdminUser])
 def user_profile_admin(request, user_id):
-    user    = get_object_or_404(User, pk=user_id)
+    user       = get_object_or_404(User, pk=user_id)
     profile, _ = UserProfile.objects.get_or_create(user=user)
     return Response(UserProfileAdminSerializer(profile).data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAdminUser])
+def user_list(request):
+    users = User.objects.select_related('profile').filter(is_active=True, is_staff=False)
+    data = [
+        {
+            'id':        u.id,
+            'username':  u.username,
+            'full_name': getattr(getattr(u, 'profile', None), 'full_name', ''),
+        }
+        for u in users
+    ]
+    return Response(data)
