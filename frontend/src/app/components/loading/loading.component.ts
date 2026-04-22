@@ -1,15 +1,19 @@
 import { Component } from '@angular/core';
-import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 
 @Component({
   selector: 'app-loading',
   standalone: true,
-  imports: [LottieComponent],
-  templateUrl: './loading.component.html',
-  styleUrl: './loading.component.css',
+  template: `
+    <div class="loading-state">
+      <div class="loading-icon">◈</div>
+      <p>Loading…</p>
+    </div>
+  `,
+  styles: [`
+    .loading-state { text-align: center; padding: 72px 24px; color: rgba(255,255,255,0.25); }
+    .loading-icon  { font-size: 48px; margin-bottom: 16px; display: inline-block; animation: spin 1.2s linear infinite; }
+    p { margin: 0; font-size: 15px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  `]
 })
-export class LoadingComponent {
-  loadingOptions: AnimationOptions = {
-    path: 'assets/animations/loading_spinner.json',
-  };
-}
+export class LoadingComponent {}
