@@ -1,28 +1,86 @@
 <div class="landing-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="hero-glow hero-glow-left"></div>
+  <div class="hero-glow hero-glow-right"></div>
 
   <main class="shell">
-    <header class="hero">
-      <span class="eyebrow">Asset Platform</span>
-      <h1>AssetTrack</h1>
-      <p>Manage your organization's assets in one place</p>
-
-      <!-- Defense note: *ngIf shows this banner only when a token already exists in localStorage. -->
-      <div class="logged-banner" *ngIf="isLoggedIn">Already logged in</div>
-
-      <a class="cta" routerLink="/login">Get Started</a>
-    </header>
+    <section class="hero" aria-label="Hero section">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">Internal Asset Platform</p>
+        <h1>Track Every Asset. Stay in Control.</h1>
+        <p class="hero-subtitle">The internal asset management platform for modern teams.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" routerLink="/login">Get Started</a>
+          <a class="btn btn-ghost" routerLink="/login">View Dashboard</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <img
+          src="assets/images/hero.svg"
+          alt="AssetOS hero preview"
+          class="hero-img"
+          onerror="this.style.opacity='0'" />
+        <div class="hero-fallback" aria-hidden="true">
+          <svg viewBox="0 0 480 340" xmlns="http://www.w3.org/2000/svg" fill="none">
+            <rect x="20" y="20" width="440" height="300" rx="16" fill="rgba(106,95,193,0.12)" stroke="rgba(106,95,193,0.35)" stroke-width="1.5"/>
+            <rect x="40" y="50" width="160" height="20" rx="6" fill="rgba(194,239,78,0.25)"/>
+            <rect x="40" y="82" width="260" height="12" rx="4" fill="rgba(255,255,255,0.1)"/>
+            <rect x="40" y="102" width="200" height="12" rx="4" fill="rgba(255,255,255,0.07)"/>
+            <rect x="40" y="140" width="120" height="38" rx="10" fill="rgba(121,98,140,0.7)"/>
+            <rect x="176" y="140" width="120" height="38" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+            <rect x="40" y="210" width="80" height="70" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(54,45,89,0.8)" stroke-width="1"/>
+            <rect x="136" y="210" width="80" height="70" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(54,45,89,0.8)" stroke-width="1"/>
+            <rect x="232" y="210" width="80" height="70" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(54,45,89,0.8)" stroke-width="1"/>
+            <circle cx="56" cy="226" r="8" fill="rgba(194,239,78,0.4)"/>
+            <circle cx="152" cy="226" r="8" fill="rgba(106,95,193,0.5)"/>
+            <circle cx="248" cy="226" r="8" fill="rgba(121,98,140,0.5)"/>
+          </svg>
+        </div>
+      </div>
+    </section>
 
     <section class="features" aria-label="Core features">
-      <!-- Defense note: *ngFor renders one card per item from the TypeScript features array. -->
-      <article class="feature-card" *ngFor="let feature of features; let i = index">
-        <span class="card-number">0{{ i + 1 }}</span>
-        <h2>{{ feature.title }}</h2>
-        <p>{{ feature.description }}</p>
+      <article class="feature-card glass-card">
+        <i data-lucide="database" aria-hidden="true"></i>
+        <h2>Full CRUD</h2>
+        <p>Create, update, and track every company asset with full lifecycle control.</p>
+      </article>
+
+      <article class="feature-card glass-card">
+        <i data-lucide="shield" aria-hidden="true"></i>
+        <h2>JWT Secured</h2>
+        <p>Authentication and API access are protected through token-based security.</p>
+      </article>
+
+      <article class="feature-card glass-card">
+        <i data-lucide="users" aria-hidden="true"></i>
+        <h2>Team Ready</h2>
+        <p>Built for admins and staff to collaborate across departments in one workflow.</p>
       </article>
     </section>
 
-    <footer class="footer">AssetTrack © 2026</footer>
+    <section class="stats glass-card" aria-label="Platform stats">
+      <div class="stat">
+        <span class="stat-value">20+</span>
+        <span class="stat-label">Assets</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">3</span>
+        <span class="stat-label">Departments</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">1</span>
+        <span class="stat-label">Platform</span>
+      </div>
+    </section>
+
+    <section class="cta glass-card" aria-label="Call to action">
+      <h2>Ready to get started?</h2>
+      <a class="btn btn-primary" routerLink="/login">Sign In</a>
+    </section>
+
+    <footer class="footer">
+      <span class="footer-brand">AssetOS</span>
+      <span class="footer-team">Yersultan &middot; Abenezer Alemayehu &middot; Yerbolat</span>
+    </footer>
   </main>
 </div>
