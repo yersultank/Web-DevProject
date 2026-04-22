@@ -8,11 +8,9 @@ A full-stack web application for tracking, managing, and assigning company asset
 
 | Name | Role |
 |------|------|
-| Yersultan K. | Full Stack Developer |
-| Member 2 | Full Stack Developer |
-| Member 3 | Full Stack Developer |
-
-> ⚠️ Update the names above with your actual team members before defense.
+| Kuralabay Yersultan|
+| Abenezer Alemayehu Lemma |
+| Yerbolat Yerkebulan|
 
 ---
 
