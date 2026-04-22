@@ -1,4 +1,4 @@
-# AssetOS — Internal Asset Tracker
+# AssetOS — Internal Asset Tracker (AssetTrack)
 
 A full-stack web application for tracking, managing, and assigning company assets. Built with Angular (frontend) and Django REST Framework (backend).
 
@@ -11,6 +11,11 @@ A full-stack web application for tracking, managing, and assigning company asset
 | Kuralabay Yersultan | Team Lead |
 | Abenezer Alemayehu Lemma | Member |
 | Yerbolat Yerkebulan | Member |
+
+**Additional contributors / aliases:**
+
+- Yersultan (yersultank)
+- abnzrdev
 
 ---
 
@@ -34,9 +39,28 @@ A full-stack web application for tracking, managing, and assigning company asset
 
 ---
 
-## 📦 Setup & Run
+## 📦 How to Start
 
-### Backend
+You can use the included scripts, or run the backend and frontend manually.
+
+### Quick (scripts)
+
+From the project root:
+
+```bash
+# Start backend
+./scripts/start-backend.sh
+
+# Start frontend
+./scripts/start-frontend.sh
+
+# Or run both (separate terminals)
+./scripts/start-project.sh
+```
+
+### Manual (detailed)
+
+#### Backend
 
 ```bash
 cd backend
@@ -49,7 +73,7 @@ python manage.py seed_assets    # seeds 20 demo assets
 python manage.py runserver
 ```
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
@@ -57,13 +81,29 @@ npm install
 ng serve
 ```
 
-Open [http://localhost:4200](http://localhost:4200)
+Open http://localhost:4200
+
+---
+
+## 📦 Seed Demo Data
+
+Run the provided script to seed demo content:
+
+```bash
+./scripts/seed-data.sh
+```
+
+Demo accounts (for local/dev only):
+
+- Admin: `admin` / `pass1234`
+- Users: `user1`, `user2`, `user3` / `pass1234`
 
 ---
 
 ## 📬 Postman Collection
 
 A Postman collection is included at:
+
 ```
 backend/postman/AssetTrack.postman_collection.json
 ```
@@ -95,3 +135,6 @@ Web-DevProject/
 ---
 
 ## 🎓 Course Project — Web Development
+
+This project was created as a course project to demonstrate a full-stack asset tracking application.
+

@@ -16,7 +16,7 @@
             "value": "application/json"
           }
         ],
-        "url": "{{base_url}}/api/auth/login/",
+        "url": "{{base_url}}/api/token/",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"adminpass123\"\n}"
@@ -33,7 +33,7 @@
             "value": "application/json"
           }
         ],
-        "url": "{{base_url}}/api/auth/refresh/",
+        "url": "{{base_url}}/api/token/refresh/",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
@@ -54,7 +54,7 @@
             "value": "Bearer {{access_token}}"
           }
         ],
-        "url": "{{base_url}}/api/auth/logout/",
+        "url": "{{base_url}}/api/logout/",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
