@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { AuthService, UserListItem } from '../../services/auth.service';
 import { Asset, Category } from '../../models/asset.model';
 
 @Component({
@@ -12,95 +13,118 @@ import { Asset, Category } from '../../models/asset.model';
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnInit {
-  userName = 'Admin User';
-  userRole = 'admin';
+  // ── Data ───────────────────────────────────────────────────────────────────
+  assets:         Asset[]    = [];
+  filteredAssets: Asset[]    = [];
+  categories:     Category[] = [];
+  userList:       UserListItem[] = [];
 
-  assets: Asset[] = [];
-  filteredAssets: Asset[] = [];
-  categories: Category[] = [];
-  loadError = '';
-
-  // ── Add form ──────────────────────────────────────────────────────────────
+  // ── UI state ───────────────────────────────────────────────────────────────
+  loadError  = '';
   showAddForm = false;
-  newAssetName = '';
-  newAssetDescription = '';
-  newAssetSerialNumber = '';
-  newAssetStatus = 'available';
-  newAssetCategoryId: number | null = null;
-  newAssetImage: File | null = null;
 
-  // ── Edit form ─────────────────────────────────────────────────────────────
+  // ── Add form ───────────────────────────────────────────────────────────────
+  newName        = '';
+  newSerial      = '';
+  newStatus      = 'available';
+  newCategoryId: number | null = null;
+  newDescription = '';
+  newImage:      File | null = null;
+
+  // ── Edit form ──────────────────────────────────────────────────────────────
   editingAsset: (Partial<Asset> & { id: number }) | null = null;
-  editingImage: File | null = null;
+  editImage:    File | null = null;
+  editError     = '';
 
-  // ── Filters ───────────────────────────────────────────────────────────────
-  searchQuery = '';
-  filterStatus = '';
-  filterCategoryId: number | string = '';
+  // ── Assign modal ──────────────────────────────────────────────────────────
+  assigningAsset: Asset | null = null;
+  assignUserId:   number | null = null;
+  assignNotes     = '';
+  assignError     = '';
+
+  // ── Filters ────────────────────────────────────────────────────────────────
+  searchQuery     = '';
+  filterStatus    = '';
+  filterCategory: number | string = '';
 
   readonly statusOptions = ['available', 'assigned', 'maintenance', 'retired'];
-  readonly baseUrl = 'http://127.0.0.1:8000';
+  readonly baseUrl       = 'http://127.0.0.1:8000';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadAssets();
     this.loadCategories();
+    this.loadUsers();
   }
 
-  // ─── Click 1: Load assets ─────────────────────────────────────────────────
+  goToProfile(): void { this.router.navigate(['/profile']); }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  // ── Load ───────────────────────────────────────────────────────────────────
+
   loadAssets(): void {
-  this.loadError = '';
-  this.authService.getAssets().subscribe({
-    next:  (assets) => { this.assets = assets; this.applyFilters(); },
-    error: ()       => { this.loadError = 'Could not load assets. Please try again.'; }
-  });
-}
-  loadCategories(): void {
-    this.authService.getCategories().subscribe({
-      next:  (cats) => { this.categories = cats; },
-      error: (err)  => console.error('Categories error:', err)
+    this.loadError = '';
+    this.authService.getAssets().subscribe({
+      next:  assets => { this.assets = assets; this.applyFilters(); },
+      error: ()     => { this.loadError = 'Could not load assets.'; },
     });
   }
 
-  // ─── Click 2: Toggle add form ─────────────────────────────────────────────
+  loadCategories(): void {
+    this.authService.getCategories().subscribe({
+      next:  cats => { this.categories = cats; },
+      error: err  => console.error('Categories:', err),
+    });
+  }
+
+  loadUsers(): void {
+    this.authService.getUserList().subscribe({
+      next:  users => { this.userList = users; },
+      error: err   => console.error('Users:', err),
+    });
+  }
+
+  // ── Add asset ──────────────────────────────────────────────────────────────
+
   toggleAddForm(): void {
     this.showAddForm = !this.showAddForm;
     this.editingAsset = null;
   }
 
-  onFileSelect(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.newAssetImage = input.files?.[0] ?? null;
+  onFileSelect(e: Event): void {
+    this.newImage = (e.target as HTMLInputElement).files?.[0] ?? null;
   }
 
-  // ─── Click 3: Add asset ───────────────────────────────────────────────────
   addAsset(): void {
-    if (!this.newAssetName.trim() || !this.newAssetSerialNumber.trim() || !this.newAssetCategoryId) return;
+    if (!this.newName.trim() || !this.newSerial.trim() || !this.newCategoryId) return;
 
     const fd = new FormData();
-    fd.append('name',          this.newAssetName.trim());
-    fd.append('serial_number', this.newAssetSerialNumber.trim());
-    fd.append('status',        this.newAssetStatus);
-    fd.append('category',      String(this.newAssetCategoryId));
-    if (this.newAssetDescription.trim()) fd.append('description', this.newAssetDescription.trim());
-    if (this.newAssetImage)              fd.append('image', this.newAssetImage);
+    fd.append('name',          this.newName.trim());
+    fd.append('serial_number', this.newSerial.trim());
+    fd.append('status',        this.newStatus);
+    fd.append('category',      String(this.newCategoryId));
+    if (this.newDescription.trim()) fd.append('description', this.newDescription.trim());
+    if (this.newImage)              fd.append('image',       this.newImage);
 
     this.authService.createAsset(fd).subscribe({
-      next:  (created) => { this.assets = [...this.assets, created]; this.applyFilters(); this.resetForm(); },
-      error: ()        => { this.loadError = 'Failed to create asset.'; }
+      next:  created => { this.assets = [...this.assets, created]; this.applyFilters(); this.resetAddForm(); },
+      error: ()      => { this.loadError = 'Failed to create asset.'; },
     });
   }
 
-  // ─── Click 4: Delete asset ────────────────────────────────────────────────
-  deleteAsset(id: number): void {
-    this.authService.deleteAsset(id).subscribe({
-      next:  () => { this.assets = this.assets.filter(a => a.id !== id); this.applyFilters(); },
-      error: () => { this.loadError = 'Failed to delete asset.'; }
-    });
+  private resetAddForm(): void {
+    this.newName = ''; this.newSerial = ''; this.newStatus = 'available';
+    this.newCategoryId = null; this.newDescription = ''; this.newImage = null;
+    this.showAddForm = false;
   }
 
-  // ─── Click 5: Start edit ──────────────────────────────────────────────────
+  // ── Edit asset ─────────────────────────────────────────────────────────────
+
   startEdit(asset: Asset): void {
     this.editingAsset = {
       id:            asset.id,
@@ -110,56 +134,98 @@ export class DashboardComponent implements OnInit {
       status:        asset.status,
       category:      this.extractCategoryId(asset.category),
     };
-    this.editingImage = null;
-    this.showAddForm  = false;
+    this.editImage  = null;
+    this.editError  = '';
+    this.showAddForm = false;
+    this.assigningAsset = null;
   }
 
-  onEditFileSelect(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.editingImage = input.files?.[0] ?? null;
+  onEditFileSelect(e: Event): void {
+    this.editImage = (e.target as HTMLInputElement).files?.[0] ?? null;
   }
 
-  // ─── Click 6: Save edit ───────────────────────────────────────────────────
   saveEdit(): void {
     if (!this.editingAsset) return;
-    const { id, name, serial_number, status, category, description } = this.editingAsset;
+    this.editError = '';
 
+    const { id, name, serial_number, status, category, description } = this.editingAsset;
     const fd = new FormData();
     if (name)             fd.append('name',          name);
     if (serial_number)    fd.append('serial_number', serial_number);
     if (status)           fd.append('status',        status);
     if (category != null) fd.append('category',      String(category));
     if (description != null) fd.append('description', description);
-    if (this.editingImage)   fd.append('image',       this.editingImage);
+    if (this.editImage)   fd.append('image',         this.editImage);
 
     this.authService.updateAsset(id, fd).subscribe({
-      next: (updated) => {
+      next: updated => {
         this.assets = this.assets.map(a => a.id === updated.id ? updated : a);
         this.applyFilters();
         this.editingAsset = null;
-        this.editingImage = null;
       },
-      error: () => { this.loadError = 'Failed to update asset.'; }
+      error: err => {
+        const detail = err.error ? JSON.stringify(err.error) : 'Server error.';
+        this.editError = `Failed to save: ${detail}`;
+      },
     });
   }
 
-  cancelEdit(): void {
-    this.editingAsset = null;
-    this.editingImage = null;
+  cancelEdit(): void { this.editingAsset = null; this.editError = ''; }
+
+  // ── Delete asset ───────────────────────────────────────────────────────────
+
+  deleteAsset(id: number): void {
+    if (!confirm('Delete this asset?')) return;
+    this.authService.deleteAsset(id).subscribe({
+      next:  () => { this.assets = this.assets.filter(a => a.id !== id); this.applyFilters(); },
+      error: () => { this.loadError = 'Failed to delete asset.'; },
+    });
   }
 
-  // ─── Filters & helpers ────────────────────────────────────────────────────
+  // ── Assign modal ───────────────────────────────────────────────────────────
+
+  openAssign(asset: Asset): void {
+    this.assigningAsset = asset;
+    this.assignUserId   = null;
+    this.assignNotes    = '';
+    this.assignError    = '';
+    this.editingAsset   = null;
+    this.showAddForm    = false;
+  }
+
+  cancelAssign(): void { this.assigningAsset = null; }
+
+  submitAssign(): void {
+    if (!this.assigningAsset || !this.assignUserId) return;
+    this.assignError = '';
+
+    this.authService.assignAsset({
+      asset: this.assigningAsset.id,
+      user:  Number(this.assignUserId),
+      notes: this.assignNotes.trim(),
+    }).subscribe({
+      next: () => { this.assigningAsset = null; this.loadAssets(); },
+      error: err => {
+        this.assignError = err.error?.asset?.[0] ?? err.error?.detail ?? 'Failed to assign asset.';
+      },
+    });
+  }
+
+  // ── Filters ────────────────────────────────────────────────────────────────
+
   applyFilters(): void {
-  const q = this.searchQuery.toLowerCase();
-  this.filteredAssets = this.assets.filter(a => {
-    const matchSearch   = !q || a.name.toLowerCase().includes(q) || (a.serial_number ?? '').toLowerCase().includes(q);
-    const matchStatus   = !this.filterStatus || a.status === this.filterStatus;
-    const matchCategory = !this.filterCategoryId || this.extractCategoryId(a.category) === Number(this.filterCategoryId);
-    return matchSearch && matchStatus && matchCategory;
-  });
-}
+    const q = this.searchQuery.toLowerCase();
+    this.filteredAssets = this.assets.filter(a => {
+      const matchSearch   = !q || a.name.toLowerCase().includes(q) || (a.serial_number ?? '').toLowerCase().includes(q);
+      const matchStatus   = !this.filterStatus || a.status === this.filterStatus;
+      const matchCategory = !this.filterCategory || this.extractCategoryId(a.category) === Number(this.filterCategory);
+      return matchSearch && matchStatus && matchCategory;
+    });
+  }
 
   onFilterChange(): void { this.applyFilters(); }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
   extractCategoryId(category: number | Category | undefined): number | undefined {
     if (category == null) return undefined;
@@ -184,15 +250,5 @@ export class DashboardComponent implements OnInit {
       peripheral: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80',
     };
     return fallbacks[cat] ?? 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80';
-  }
-
-  private resetForm(): void {
-    this.newAssetName = '';
-    this.newAssetDescription = '';
-    this.newAssetSerialNumber = '';
-    this.newAssetStatus = 'available';
-    this.newAssetCategoryId = null;
-    this.newAssetImage = null;
-    this.showAddForm = false;
   }
 }

@@ -8,18 +8,12 @@
     </div>
     <nav class="sidebar-nav">
       <a class="nav-item active"><span class="nav-icon">⬡</span> Dashboard</a>
-      <a class="nav-item"><span class="nav-icon">◎</span> Assets</a>
-      <a class="nav-item"><span class="nav-icon">◷</span> History</a>
-      <a class="nav-item"><span class="nav-icon">⬟</span> Reports</a>
+      <a class="nav-item" (click)="goToProfile()" style="cursor:pointer">
+        <span class="nav-icon">⬟</span> My Profile
+      </a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-badge">
-        <div class="user-avatar">{{ userName[0] }}</div>
-        <div class="user-info">
-          <span class="user-name">{{ userName }}</span>
-          <span class="user-role">{{ userRole }}</span>
-        </div>
-      </div>
+      <button class="btn btn-ghost" (click)="logout()">Sign Out</button>
     </div>
   </aside>
 
@@ -33,18 +27,14 @@
         <p class="topbar-sub">{{ filteredAssets.length }} of {{ assets.length }} assets</p>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" (click)="loadAssets()">
-          ↻ Refresh
+        <button class="btn btn-ghost" (click)="loadAssets()">↻ Refresh</button>
+        <button class="btn btn-primary" (click)="toggleAddForm()">
+          {{ showAddForm ? '✕ Cancel' : '+ Add Asset' }}
         </button>
-        @if (userRole === 'admin') {
-          <button class="btn btn-primary" (click)="toggleAddForm()">
-            {{ showAddForm ? '✕ Cancel' : '+ Add Asset' }}
-          </button>
-        }
       </div>
     </header>
 
-    <!-- Error banner -->
+    <!-- Global error -->
     @if (loadError) {
       <div class="alert alert-error">
         <span>⚠ {{ loadError }}</span>
@@ -60,17 +50,17 @@
 
           <div class="form-field">
             <label>Asset Name *</label>
-            <input [(ngModel)]="newAssetName" placeholder="e.g. MacBook Pro 14" />
+            <input [(ngModel)]="newName" placeholder="e.g. MacBook Pro 14" />
           </div>
 
           <div class="form-field">
             <label>Serial Number *</label>
-            <input [(ngModel)]="newAssetSerialNumber" placeholder="e.g. C02XK1ZFJG5M" />
+            <input [(ngModel)]="newSerial" placeholder="e.g. C02XK1ZFJG5M" />
           </div>
 
           <div class="form-field">
             <label>Status</label>
-            <select [(ngModel)]="newAssetStatus">
+            <select [(ngModel)]="newStatus">
               @for (s of statusOptions; track s) {
                 <option [value]="s">{{ s | titlecase }}</option>
               }
@@ -79,7 +69,7 @@
 
           <div class="form-field">
             <label>Category *</label>
-            <select [(ngModel)]="newAssetCategoryId">
+            <select [(ngModel)]="newCategoryId">
               <option [value]="null">— Select —</option>
               @for (c of categories; track c.id) {
                 <option [value]="c.id">{{ c.name }}</option>
@@ -89,7 +79,7 @@
 
           <div class="form-field form-field-full">
             <label>Description</label>
-            <textarea [(ngModel)]="newAssetDescription" rows="2" placeholder="Optional description…"></textarea>
+            <textarea [(ngModel)]="newDescription" rows="2" placeholder="Optional description…"></textarea>
           </div>
 
           <div class="form-field">
@@ -101,7 +91,7 @@
         <div class="form-actions">
           <button class="btn btn-primary"
             (click)="addAsset()"
-            [disabled]="!newAssetName.trim() || !newAssetSerialNumber.trim() || !newAssetCategoryId">
+            [disabled]="!newName.trim() || !newSerial.trim() || !newCategoryId">
             Save Asset
           </button>
           <button class="btn btn-ghost" (click)="toggleAddForm()">Cancel</button>
@@ -113,6 +103,14 @@
     @if (editingAsset) {
       <section class="glass-card form-card edit-form">
         <h2 class="form-title">Edit Asset #{{ editingAsset.id }}</h2>
+
+        @if (editError) {
+          <div class="alert alert-error" style="margin-bottom:1rem">
+            <span>⚠ {{ editError }}</span>
+            <button class="alert-close" (click)="editError = ''">✕</button>
+          </div>
+        }
+
         <div class="form-grid">
 
           <div class="form-field">
@@ -156,9 +154,49 @@
         </div>
         <div class="form-actions">
           <button class="btn btn-primary" (click)="saveEdit()">Save Changes</button>
-          <button class="btn btn-ghost" (click)="cancelEdit()">Cancel</button>
+          <button class="btn btn-ghost"   (click)="cancelEdit()">Cancel</button>
         </div>
       </section>
+    }
+
+    <!-- ── Assign Modal ── -->
+    @if (assigningAsset) {
+      <div class="modal-overlay" (click)="cancelAssign()">
+        <section class="glass-card modal-card" (click)="$event.stopPropagation()">
+          <h2 class="form-title">Assign: {{ assigningAsset.name }}</h2>
+
+          @if (assignError) {
+            <div class="alert alert-error" style="margin-bottom:1rem">
+              <span>⚠ {{ assignError }}</span>
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-field form-field-full">
+              <label>Select User *</label>
+              <select [(ngModel)]="assignUserId">
+                <option [value]="null">— Choose a user —</option>
+                @for (u of userList; track u.id) {
+                  <option [value]="u.id">
+                    {{ u.full_name || u.username }} ({{ u.username }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="form-field form-field-full">
+              <label>Notes</label>
+              <textarea [(ngModel)]="assignNotes" rows="2" placeholder="Optional notes…"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" (click)="submitAssign()" [disabled]="!assignUserId">
+              Assign Asset
+            </button>
+            <button class="btn btn-ghost" (click)="cancelAssign()">Cancel</button>
+          </div>
+        </section>
+      </div>
     }
 
     <!-- ── Filters ── -->
@@ -171,7 +209,7 @@
           <option [value]="s">{{ s | titlecase }}</option>
         }
       </select>
-      <select class="filter-select" [(ngModel)]="filterCategoryId" (ngModelChange)="onFilterChange()">
+      <select class="filter-select" [(ngModel)]="filterCategory" (ngModelChange)="onFilterChange()">
         <option value="">All Categories</option>
         @for (c of categories; track c.id) {
           <option [value]="c.id">{{ c.name }}</option>
@@ -185,10 +223,8 @@
         <div class="empty-icon">◈</div>
         @if (assets.length > 0) {
           <p>No assets match your filters.</p>
-          <p class="empty-sub">Try adjusting your search or filters.</p>
         } @else {
-          <p>No assets yet.</p>
-          <p class="empty-sub">Click "+ Add Asset" to get started.</p>
+          <p>No assets yet. Click "+ Add Asset" to get started.</p>
         }
       </div>
     } @else {
@@ -197,12 +233,7 @@
           <article class="asset-card glass-card">
 
             <div class="asset-img-wrap">
-              <img
-                class="asset-img"
-                [src]="getAssetImage(asset)"
-                [alt]="asset.name"
-                loading="lazy"
-              />
+              <img class="asset-img" [src]="getAssetImage(asset)" [alt]="asset.name" loading="lazy" />
               <span class="asset-status-badge" [attr.data-status]="asset.status">
                 {{ asset.status | titlecase }}
               </span>
@@ -218,15 +249,17 @@
               @if (asset.description) {
                 <p class="asset-description">{{ asset.description }}</p>
               }
+              @if (asset.assignee) {
+                <p class="asset-assignee">↗ {{ asset.assignee.username }}</p>
+              }
             </div>
 
             <div class="asset-footer">
-              <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">
-                ✎ Edit
-              </button>
-              <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">
-                ✕
-              </button>
+              <button class="icon-btn edit-btn" (click)="startEdit(asset)">✎ Edit</button>
+              @if (asset.status === 'available') {
+                <button class="icon-btn assign-btn" (click)="openAssign(asset)">↗ Assign</button>
+              }
+              <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)">✕</button>
             </div>
 
           </article>
