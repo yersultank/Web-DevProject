@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,15 +19,15 @@ export class MyAssetsComponent implements OnInit {
 
   readonly baseUrl = 'http://127.0.0.1:8000';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.loadMyAssets(); }
 
   loadMyAssets(): void {
     this.error = '';
     this.authService.getMyAssets().subscribe({
-      next:  data => { this.assets = data; },
-      error: ()   => { this.error = 'Could not load your assets.'; },
+      next:  data => { this.assets = data; this.cdr.detectChanges(); },
+      error: ()   => { this.error = 'Could not load your assets.'; this.cdr.detectChanges(); },
     });
   }
 
