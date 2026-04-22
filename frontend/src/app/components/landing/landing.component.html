@@ -3,14 +3,24 @@
   <div class="hero-glow hero-glow-right"></div>
 
   <main class="shell">
+    <header class="topbar glass-card" aria-label="Primary navigation">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span class="brand-text">AssetOS</span>
+      </a>
+      <a class="topbar-link" [routerLink]="dashboardRoute">
+        {{ isLoggedIn ? 'Dashboard' : 'Login' }}
+      </a>
+    </header>
+
     <section class="hero" aria-label="Hero section">
       <div class="hero-copy">
         <p class="hero-eyebrow">Internal Asset Platform</p>
         <h1>Track Every Asset. Stay in Control.</h1>
         <p class="hero-subtitle">The internal asset management platform for modern teams.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" routerLink="/login">Get Started</a>
-          <a class="btn btn-ghost" routerLink="/dashboard">View Dashboard</a>
+          <a class="btn btn-primary" [routerLink]="ctaRoute">{{ heroPrimaryLabel }}</a>
+          <a class="btn btn-ghost" [routerLink]="dashboardRoute">{{ dashboardButtonLabel }}</a>
         </div>
       </div>
       <div class="hero-media">
@@ -40,29 +50,27 @@
 
     <section class="stats glass-card" aria-label="Platform stats">
       <div class="stat">
-        <span class="stat-value">20+</span>
-        <span class="stat-label">Assets</span>
+        <span class="stat-value">{{ stats.assets }}</span>
+        <span class="stat-label">{{ assetsLabel }}</span>
       </div>
       <div class="stat">
-        <span class="stat-value">3</span>
+        <span class="stat-value">{{ stats.departments }}</span>
         <span class="stat-label">Departments</span>
       </div>
       <div class="stat">
-        <span class="stat-value">1</span>
+        <span class="stat-value">{{ stats.platform }}</span>
         <span class="stat-label">Platform</span>
       </div>
     </section>
 
     <section class="cta glass-card" aria-label="Call to action">
       <h2>Ready to get started?</h2>
-      <a class="btn btn-primary" routerLink="/login">Sign In</a>
+      <a class="btn btn-primary" [routerLink]="ctaRoute">{{ ctaLabel }}</a>
     </section>
 
     <footer class="footer">
       <span class="footer-brand">AssetOS</span>
-      <span class="footer-team">Yersultan · Abenezer Alemayehu</span>
+      <span class="footer-copy">© 2026 AssetOS</span>
     </footer>
   </main>
 </div>
-
-<script src="https://unpkg.com/lucide@latest"></script>
