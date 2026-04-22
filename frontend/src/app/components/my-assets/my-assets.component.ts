@@ -13,8 +13,10 @@ import { MyAsset } from '../../models/user-profile.model';
   styleUrl: './my-assets.component.css',
 })
 export class MyAssetsComponent implements OnInit {
-  assets: any[] = [];
+  assets: MyAsset[] = [];
   error = '';
+  returnError = '';
+  returningId: number | null = null;
   emptyOptions: AnimationOptions = { path: 'assets/animations/empty_state.json' };
   readonly baseUrl = 'http://127.0.0.1:8000';
 
