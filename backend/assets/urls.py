@@ -5,7 +5,7 @@ from assets.views import (
     AssetViewSet, CategoryViewSet, ConditionReportViewSet,
     AssignmentCreateView, MyAssetsView,
     DashboardStatsView, ReturnAssetView,
-    my_profile, user_profile_admin, user_list
+    my_profile, user_profile_admin, user_list, asset_history, my_asset_history
 )
 
 router = DefaultRouter()
@@ -25,4 +25,6 @@ urlpatterns = [
     path('users/<int:user_id>/profile/', user_profile_admin, name='user-profile-admin'),
     path('assignments/<int:assignment_id>/return/', ReturnAssetView.as_view(), name='return-asset'),
     path('users/',        user_list,                       name='user-list'),
+    path('history/',      asset_history,                   name='asset-history'),
+    path('my-history/',   my_asset_history,                name='my-asset-history'),
 ]

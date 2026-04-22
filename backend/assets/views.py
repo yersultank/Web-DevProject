@@ -10,14 +10,14 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .models import Asset, Assignment, Category, ConditionReport, UserProfile
+from .models import Asset, Assignment, Category, ConditionReport, StatusLog, UserProfile
 from .serializers import (
     AssetSerializer, AssetDetailSerializer,
     AssignmentCreateSerializer, AssignmentHistorySerializer,
     AuthTokenObtainPairSerializer,
     CategorySerializer, ConditionReportSerializer,
     DashboardStatsSerializer, LogoutSerializer,
-    MyAssetSerializer,
+    MyAssetSerializer, StatusLogSerializer,
     UserProfileSerializer, UserProfileAdminSerializer,
     UserRegisterSerializer,
 )
@@ -61,16 +61,32 @@ class AssetViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return AssetDetailSerializer if self.action == 'retrieve' else AssetSerializer
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        StatusLog.objects.create(
+            asset=instance,
+            from_status='',
+            to_status=instance.status,
+        )
+
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         instance = self.get_object()
         old_status = instance.status
+        status_notes = request.data.get('status_notes', '')
 
         response = super().update(request, *args, **kwargs)
 
         instance.refresh_from_db()
-        if old_status == Asset.Status.ASSIGNED and instance.status != Asset.Status.ASSIGNED:
-            instance.close_active_assignments()
+        if old_status != instance.status:
+            StatusLog.objects.create(
+                asset=instance,
+                from_status=old_status,
+                to_status=instance.status,
+                notes=status_notes,
+            )
+            if old_status == Asset.Status.ASSIGNED:
+                instance.close_active_assignments()
 
         return response
 
@@ -94,6 +110,12 @@ class AssignmentCreateView(APIView):
         serializer = AssignmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save()
+        StatusLog.objects.create(
+            asset=assignment.asset,
+            from_status=Asset.Status.AVAILABLE,
+            to_status=Asset.Status.ASSIGNED,
+            assigned_to=assignment.user,
+        )
         return Response(
             AssignmentHistorySerializer(assignment).data,
             status=status.HTTP_201_CREATED,
@@ -116,6 +138,12 @@ class ReturnAssetView(APIView):
         asset = assignment.asset
         asset.status = Asset.Status.AVAILABLE
         asset.save(update_fields=['status', 'updated_at'])
+
+        StatusLog.objects.create(
+            asset=asset,
+            from_status=Asset.Status.ASSIGNED,
+            to_status=Asset.Status.AVAILABLE,
+        )
 
         return Response({'detail': 'Asset returned successfully.'}, status=status.HTTP_200_OK)
 
@@ -189,3 +217,35 @@ def user_list(request):
         for u in users
     ]
     return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def my_asset_history(request):
+    asset_ids = (
+        Assignment.objects
+        .filter(user=request.user)
+        .values_list('asset_id', flat=True)
+        .distinct()
+    )
+    logs = (
+        StatusLog.objects
+        .filter(asset_id__in=asset_ids)
+        .select_related('asset', 'assigned_to')
+        .order_by('-changed_at')
+    )
+    return Response(StatusLogSerializer(logs, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAdminUser])
+def asset_history(request):
+    asset_id = request.query_params.get('asset')
+    qs = (
+        StatusLog.objects
+        .select_related('asset', 'assigned_to')
+        .order_by('-changed_at')
+    )
+    if asset_id:
+        qs = qs.filter(asset_id=asset_id)
+    return Response(StatusLogSerializer(qs, many=True).data)

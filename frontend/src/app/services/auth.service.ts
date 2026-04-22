@@ -17,6 +17,18 @@ export interface AssignPayload {
   notes?: string;
 }
 
+export interface StatusLog {
+  id: number;
+  asset_id: number;
+  asset_name: string;
+  asset_sn: string;
+  from_status: string;
+  to_status: string;
+  changed_at: string;
+  assigned_to: string | null;
+  notes: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = 'http://127.0.0.1:8000/api';
@@ -90,5 +102,14 @@ export class AuthService {
 
   getUserList(): Observable<UserListItem[]> {
     return this.http.get<UserListItem[]>(`${this.api}/users/`);
+  }
+
+  getHistory(assetId?: number): Observable<StatusLog[]> {
+    const params = assetId ? `?asset=${assetId}` : '';
+    return this.http.get<StatusLog[]>(`${this.api}/history/${params}`);
+  }
+
+  getMyHistory(): Observable<StatusLog[]> {
+    return this.http.get<StatusLog[]>(`${this.api}/my-history/`);
   }
 }
