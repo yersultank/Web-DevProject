@@ -358,6 +358,27 @@
 .asset-status-badge[data-status="maintenance"] { background: rgba(255,165,0,0.15);  color:#ffa500; }
 .asset-status-badge[data-status="retired"]     { background: rgba(248,81,73,0.15);  color:#f85149; }
 
+.asset-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.btn-return {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(245,158,11,0.35);
+  background: rgba(245,158,11,0.1);
+  color: #f59e0b;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-return:hover:not(:disabled) { background: rgba(245,158,11,0.22); color: #fbbf24; }
+.btn-return:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* ═══════════════════════════════════════════════
    FORM
    ═══════════════════════════════════════════════ */

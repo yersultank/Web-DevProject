@@ -13,72 +13,77 @@ import { UserProfile } from '../../models/user-profile.model';
   styleUrl: './profile.component.css',
 })
 export class ProfileComponent implements OnInit {
-  profile: UserProfile = { phone: '', office_address: '', department: '', position: '' };
+  profile: UserProfile = { full_name: '', phone: '', office_address: '', department: '', position: '' };
   editForm: Partial<UserProfile> = {};
-  isEditing = false;
-  isSaving  = false;
-  error     = '';
-  success   = '';
+
+  isEditing   = false;
+  isSaving    = false;
+  error       = '';
+  success     = '';
+  returningId: number | null = null;
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    setTimeout(() => this.loadProfile(), 0);
-  }
-
-  loadProfile(): void {
-    this.error = '';
-    this.authService.getMyProfile().subscribe({
-      next:  (data) => { this.profile = data; },
-      error: ()     => { this.error = 'Could not load profile.'; }
-    });
-  }
-
-  startEdit(): void {
-    this.editForm = {
-      phone:          this.profile.phone,
-      office_address: this.profile.office_address,
-      department:     this.profile.department,
-      position:       this.profile.position,
-    };
-    this.isEditing = true;
-    this.success   = '';
-    this.error     = '';
-  }
-
-  cancelEdit(): void {
-    this.isEditing = false;
-    this.editForm  = {};
-    this.error     = '';
-  }
-
-  saveProfile(): void {
-    if (this.isSaving) return;
-    this.isSaving = true;
-    this.error    = '';
-    this.success  = '';
-
-    this.authService.updateMyProfile(this.editForm).subscribe({
-      next: (data) => {
-        this.profile   = data;
-        this.isEditing = false;
-        this.isSaving  = false;
-        this.success   = 'Profile saved successfully!';
-        setTimeout(() => (this.success = ''), 3000);
-      },
-      error: () => {
-        this.error    = 'Failed to save profile.';
-        this.isSaving = false;
-      }
-    });
-  }
+  ngOnInit(): void { this.loadProfile(); }
 
   goBack(): void {
     this.router.navigate([this.profile.is_staff ? '/dashboard' : '/my-assets']);
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  loadProfile(): void {
+    this.authService.getMyProfile().subscribe({
+      next: data => {
+        this.profile = data;
+        if (!data.is_staff) {
+          this.authService.getMyAssets().subscribe({
+            next: assets => { this.profile = { ...this.profile, assets }; },
+          });
+        }
+      },
+      error: () => { this.error = 'Could not load profile.'; },
+    });
+  }
+
+  startEdit(): void {
+    this.editForm   = { ...this.profile };
+    this.isEditing  = true;
+    this.success    = '';
+    this.error      = '';
+  }
+
+  cancelEdit(): void { this.isEditing = false; this.editForm = {}; }
+
+  saveProfile(): void {
+    if (this.isSaving) return;
+    this.isSaving = true;
+    this.error = '';
+    this.success = '';
+
+    this.authService.updateMyProfile(this.editForm).subscribe({
+      next: data => {
+        this.profile   = { ...data, assets: this.profile.assets };
+        this.isSaving  = false;
+        this.isEditing = false;
+        this.success   = 'Profile saved successfully!';
+        setTimeout(() => (this.success = ''), 3000);
+      },
+      error: () => {
+        this.isSaving = false;
+        this.error = 'Could not save profile.';
+      },
+    });
+  }
+
+  returnAsset(assignmentId: number): void {
+    if (this.returningId !== null) return;
+    this.returningId = assignmentId;
+
+    this.authService.returnAsset(assignmentId).subscribe({
+      next: () => { this.returningId = null; this.loadProfile(); },
+      error: () => {
+        this.returningId = null;
+        this.error = 'Could not return the asset.';
+      },
+    });
   }
 }

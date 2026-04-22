@@ -1,6 +1,5 @@
 <div class="dashboard">
 
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <span class="logo-icon">◈</span>
@@ -26,14 +25,13 @@
     </div>
   </aside>
 
-  <!-- Main -->
   <main class="main">
 
     <header class="topbar">
       <div class="topbar-title">
         <h1>My <span class="title-accent">Profile</span></h1>
         <p class="topbar-sub">
-          {{ profile.username ?? 'Loading…' }}
+          {{ profile.full_name || profile.username || 'Loading…' }}
           @if (profile.is_staff) {
             <span class="role-badge">Admin</span>
           }
@@ -48,7 +46,6 @@
       </div>
     </header>
 
-    <!-- Alerts -->
     @if (error) {
       <div class="alert alert-error">
         <span>⚠ {{ error }}</span>
@@ -59,53 +56,73 @@
       <div class="alert alert-success">✓ {{ success }}</div>
     }
 
-    <!-- View Mode -->
     @if (!isEditing) {
       <div class="profile-layout">
 
-        <!-- Avatar card -->
         <div class="glass-card avatar-card">
           <div class="big-avatar">
             {{ profile.username ? profile.username[0].toUpperCase() : '?' }}
           </div>
-          <div class="avatar-name">{{ profile.username ?? '—' }}</div>
+          <div class="avatar-name">{{ profile.full_name || profile.username || '—' }}</div>
           <div class="avatar-role">{{ profile.is_staff ? 'Administrator' : 'User' }}</div>
-          <button class="btn btn-primary btn-full" (click)="startEdit()">✎ Edit Profile</button>
+          <button class="btn btn-primary btn-full" (click)="startEdit()" style="margin-top: 1.5rem">
+            ✎ Edit Profile
+          </button>
         </div>
 
-        <!-- Info card -->
         <div class="glass-card info-card">
           <h2 class="card-section-title">Personal Information</h2>
           <div class="profile-fields">
+            
+            <div class="profile-row">
+              <span class="profile-label">Full Name</span>
+              <span class="profile-value">{{ profile.full_name || '—' }}</span>
+            </div>
+
             <div class="profile-row">
               <span class="profile-label">Department</span>
               <span class="profile-value">{{ profile.department || '—' }}</span>
             </div>
+
             <div class="profile-row">
               <span class="profile-label">Position</span>
               <span class="profile-value">{{ profile.position || '—' }}</span>
             </div>
+
             <div class="profile-row">
               <span class="profile-label">Phone</span>
               <span class="profile-value">{{ profile.phone || '—' }}</span>
             </div>
+
             <div class="profile-row">
               <span class="profile-label">Office</span>
               <span class="profile-value">{{ profile.office_address || '—' }}</span>
             </div>
+
           </div>
 
-          <!-- Assigned assets -->
           @if (profile.assets && profile.assets.length > 0) {
-            <h2 class="card-section-title" style="margin-top: 2rem">Assigned Assets</h2>
+            <h2 class="card-section-title" style="margin-top: 2.5rem">Assigned Assets</h2>
             <div class="asset-list">
               @for (asset of profile.assets; track asset.asset_id) {
                 <div class="asset-list-item">
-                  <span class="asset-list-name">{{ asset.asset_name }}</span>
-                  <span class="asset-list-sn">{{ asset.serial_number }}</span>
-                  <span class="asset-status-badge" [attr.data-status]="asset.status">
-                    {{ asset.status | titlecase }}
-                  </span>
+                  <div class="asset-info-main">
+                    <span class="asset-list-name">{{ asset.asset_name }}</span>
+                    <span class="asset-list-sn">{{ asset.serial_number }}</span>
+                  </div>
+                  <div class="asset-list-actions">
+                    <span class="asset-status-badge" [attr.data-status]="asset.status">
+                      {{ asset.status | titlecase }}
+                    </span>
+                    @if (!profile.is_staff) {
+                      <button
+                        class="btn-return"
+                        (click)="returnAsset(asset.id)"
+                        [disabled]="returningId === asset.id">
+                        {{ returningId === asset.id ? 'Returning…' : '↩ Return' }}
+                      </button>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -115,36 +132,41 @@
       </div>
     }
 
-    <!-- Edit Mode -->
     @if (isEditing) {
       <section class="glass-card form-card">
-        <h2 class="form-title">Edit Profile</h2>
+        <h2 class="form-title">Update Your Details</h2>
         <div class="form-grid">
 
           <div class="form-field">
+            <label>Full Name</label>
+            <input type="text" [(ngModel)]="editForm.full_name" placeholder="John Doe" />
+          </div>
+
+          <div class="form-field">
             <label>Department</label>
-            <input [(ngModel)]="editForm.department" placeholder="e.g. IT, Finance…" />
+            <input type="text" [(ngModel)]="editForm.department" placeholder="e.g. IT, Logistics…" />
           </div>
 
           <div class="form-field">
             <label>Position</label>
-            <input [(ngModel)]="editForm.position" placeholder="e.g. Developer, Manager…" />
+            <input type="text" [(ngModel)]="editForm.position" placeholder="e.g. Software Engineer…" />
           </div>
 
           <div class="form-field">
-            <label>Phone</label>
-            <input [(ngModel)]="editForm.phone" placeholder="+7 777 000 00 00" />
+            <label>Phone Number</label>
+            <input type="text" [(ngModel)]="editForm.phone" placeholder="+7 777 000 00 00" />
           </div>
 
           <div class="form-field">
             <label>Office Address</label>
-            <input [(ngModel)]="editForm.office_address" placeholder="e.g. Room 204, Block A" />
+            <input type="text" [(ngModel)]="editForm.office_address" placeholder="e.g. Block A, Office 302" />
           </div>
 
         </div>
+
         <div class="form-actions">
           <button class="btn btn-primary" (click)="saveProfile()" [disabled]="isSaving">
-            {{ isSaving ? 'Saving…' : 'Save Changes' }}
+            {{ isSaving ? 'Saving Changes...' : 'Save Changes' }}
           </button>
           <button class="btn btn-ghost" (click)="cancelEdit()">Cancel</button>
         </div>
