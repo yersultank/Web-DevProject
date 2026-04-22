@@ -73,6 +73,24 @@ class ConditionReport(models.Model):
         return f'{self.asset.serial_number} — {self.condition}'
 
 
+class StatusLog(models.Model):
+    asset       = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='status_logs')
+    from_status = models.CharField(max_length=20, blank=True)
+    to_status   = models.CharField(max_length=20)
+    changed_at  = models.DateTimeField(default=timezone.now)
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='status_log_assignments'
+    )
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ('-changed_at',)
+
+    def __str__(self):
+        return f'{self.asset.serial_number}: {self.from_status or "created"} → {self.to_status}'
+
+
 class UserProfile(models.Model):
     user           = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     full_name      = models.CharField(max_length=255, blank=True)

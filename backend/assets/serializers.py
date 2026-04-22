@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import User
-from .models import Asset, Assignment, Category, ConditionReport, UserProfile
+from .models import Asset, Assignment, Category, ConditionReport, StatusLog, UserProfile
 
 
 class AuthTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -116,6 +116,17 @@ class MyAssetSerializer(serializers.ModelSerializer):
         fields = ('id', 'asset_id', 'asset_name', 'serial_number',
                   'status', 'category_name', 'image', 'description',
                   'assigned_at', 'notes')
+
+
+class StatusLogSerializer(serializers.ModelSerializer):
+    asset_name  = serializers.CharField(source='asset.name',          read_only=True)
+    asset_sn    = serializers.CharField(source='asset.serial_number',  read_only=True)
+    assigned_to = serializers.CharField(source='assigned_to.username', read_only=True, allow_null=True)
+
+    class Meta:
+        model  = StatusLog
+        fields = ('id', 'asset_id', 'asset_name', 'asset_sn',
+                  'from_status', 'to_status', 'changed_at', 'assigned_to', 'notes')
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

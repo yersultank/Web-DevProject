@@ -53,7 +53,8 @@ export class DashboardComponent implements OnInit {
     this.loadUsers();
   }
 
-  goToProfile(): void { this.router.navigate(['/profile']); }
+  goToProfile(): void  { this.router.navigate(['/profile']); }
+  goToHistory(): void  { this.router.navigate(['/history']); }
 
   logout(): void {
     this.authService.logout();
