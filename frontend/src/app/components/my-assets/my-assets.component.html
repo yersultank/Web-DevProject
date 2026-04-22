@@ -36,12 +36,14 @@
       <div class="alert alert-error">⚠ {{ returnError }}</div>
     }
 
-    @if (assets.length === 0) {
+    <ng-container *ngIf="assets.length === 0; else assetGridTpl">
       <div class="empty-state">
-        <div class="empty-icon">◈</div>
-        <p>No assets assigned to you.</p>
+        <ng-lottie [options]="emptyOptions" style="width:240px;height:240px;margin:auto;"></ng-lottie>
+        <p>No assets found.</p>
       </div>
-    } @else {
+    </ng-container>
+
+    <ng-template #assetGridTpl>
       <div class="asset-grid">
         @for (asset of assets; track asset.asset_id) {
           <article class="asset-card glass-card">
@@ -75,7 +77,6 @@
           </article>
         }
       </div>
-    }
-
+    </ng-template>
   </main>
 </div>

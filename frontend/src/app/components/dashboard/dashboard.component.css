@@ -81,8 +81,13 @@
 
 /* ── Main ────────────────────────────────────────────── */
 .main {
-  flex: 1; padding: 32px 36px; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 20px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* ── Topbar ──────────────────────────────────────────── */
@@ -305,12 +310,64 @@
   border-top: 1px solid var(--border-glass);
 }
 
-/* ── Empty / Loading State ───────────────────────────── */
-.empty-state { text-align: center; padding: 72px 24px; color: var(--text-muted); }
-.empty-icon  { font-size: 48px; margin-bottom: 16px; opacity: 0.4; display: inline-block; }
-.empty-state p { margin: 0; font-size: 15px; }
-.empty-icon.spin { animation: spin 1.2s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: rgba(106, 95, 193, 0.22);
+  color: var(--text-primary);
+}
+
+.delete-btn:hover {
+  background: rgba(250, 127, 170, 0.2);
+  color: var(--accent-pink);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  color: var(--accent-lime);
+  opacity: 0.45;
+}
+
+.empty-sub {
+  color: var(--text-muted);
+}
+
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(21, 15, 35, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 992px) {
+  .main {
+    padding: 24px 18px;
+  }
+
+  .filters-bar {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {

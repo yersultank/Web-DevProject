@@ -34,8 +34,62 @@
   margin-bottom: 12px;
 }
 
-.auth-title {
-  color: #e8f0fe;
+.brand-content h1 {
+  margin: 0;
+  font-family: 'Dammit Sans', 'Rubik', sans-serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brand-tagline {
+  margin: 1.4rem 0 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+.auth-illustration {
+  max-width: 260px;
+  margin-top: 2rem;
+  opacity: 0.85;
+}
+
+.form-panel {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(31, 22, 51, 0.72), rgba(21, 15, 35, 0.9));
+  padding: 2rem;
+}
+
+.form-wrap {
+  width: min(430px, 92%);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-purple);
+  border-radius: 12px;
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: rgba(22, 15, 36, 0.9) 0px 4px 4px 9px;
+  padding: 2rem;
+}
+
+.form-header {
+  margin-bottom: 1.4rem;
+}
+
+.form-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: var(--accent-lime);
+}
+
+.form-header h2 {
+  margin: 0;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;

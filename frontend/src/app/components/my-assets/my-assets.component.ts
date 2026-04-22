@@ -1,33 +1,46 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 import { AuthService } from '../../services/auth.service';
 import { MyAsset } from '../../models/user-profile.model';
 
 @Component({
   selector: 'app-my-assets',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LottieComponent],
   templateUrl: './my-assets.component.html',
   styleUrl: './my-assets.component.css',
 })
 export class MyAssetsComponent implements OnInit {
-  assets:      MyAsset[] = [];
-  error        = '';
+  assets: MyAsset[] = [];
+  error = '';
+  returnError = '';
   returningId: number | null = null;
-  returnError  = '';
-
+  emptyOptions: AnimationOptions = { path: 'assets/animations/empty_state.json' };
   readonly baseUrl = 'http://127.0.0.1:8000';
 
-  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  ngOnInit(): void { this.loadMyAssets(); }
+  ngOnInit(): void {
+    this.loadMyAssets();
+  }
 
   loadMyAssets(): void {
     this.error = '';
     this.authService.getMyAssets().subscribe({
-      next:  data => { this.assets = data; this.cdr.detectChanges(); },
-      error: ()   => { this.error = 'Could not load your assets.'; this.cdr.detectChanges(); },
+      next: (data) => {
+        this.assets = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Could not load your assets.';
+        this.cdr.detectChanges();
+      },
     });
   }
 

@@ -221,57 +221,67 @@
     </section>
 
     <!-- ── Asset Grid ── -->
-    @if (isLoading && assets.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon spin">◈</div>
-        <p>Loading assets…</p>
-      </div>
-    } @else if (filteredAssets.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">◈</div>
-        @if (assets.length > 0) {
-          <p>No assets match your filters.</p>
-        } @else {
-          <p>No assets yet. Click "+ Add Asset" to get started.</p>
-        }
-      </div>
+    @if (loading) {
+      <app-loading></app-loading>
     } @else {
-      <div class="asset-grid">
-        @for (asset of filteredAssets; track asset.id) {
-          <article class="asset-card glass-card">
+      @if (filteredAssets.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">◈</div>
+          @if (assets.length > 0) {
+            <p>No assets match your filters.</p>
+            <p class="empty-sub">Try adjusting your search or filters.</p>
+          } @else {
+            <p>No assets yet.</p>
+            <p class="empty-sub">Click "+ Add Asset" to get started.</p>
+          }
+        </div>
+      } @else {
+        <div class="asset-grid">
+          @for (asset of filteredAssets; track asset.id) {
+            <article class="asset-card glass-card">
 
-            <div class="asset-img-wrap">
-              <img class="asset-img" [src]="getAssetImage(asset)" [alt]="asset.name" loading="lazy" />
-              <span class="asset-status-badge" [attr.data-status]="asset.status">
-                {{ asset.status | titlecase }}
-              </span>
-            </div>
-
-            <div class="asset-content">
-              <div class="asset-meta">
-                <span class="asset-category">{{ getCategoryName(asset) }}</span>
-                <span class="asset-id">#{{ asset.id }}</span>
+              <div class="asset-img-wrap">
+                <img
+                  class="asset-img"
+                  [src]="getAssetImage(asset)"
+                  [alt]="asset.name"
+                  loading="lazy"
+                />
+                <span class="asset-status-badge" [attr.data-status]="asset.status">
+                  {{ asset.status | titlecase }}
+                </span>
               </div>
-              <h3 class="asset-name">{{ asset.name }}</h3>
-              <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
-              @if (asset.description) {
-                <p class="asset-description">{{ asset.description }}</p>
-              }
-              @if (asset.assignee) {
-                <p class="asset-assignee">↗ {{ asset.assignee.username }}</p>
-              }
-            </div>
 
-            <div class="asset-footer">
-              <button class="icon-btn edit-btn" (click)="startEdit(asset)">✎ Edit</button>
-              @if (asset.status === 'available') {
-                <button class="icon-btn assign-btn" (click)="openAssign(asset)">↗ Assign</button>
-              }
-              <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)">✕</button>
-            </div>
+              <div class="asset-content">
+                <div class="asset-meta">
+                  <span class="asset-category">{{ getCategoryName(asset) }}</span>
+                  <span class="asset-id">#{{ asset.id }}</span>
+                </div>
+                <h3 class="asset-name">{{ asset.name }}</h3>
+                <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
+                @if (asset.description) {
+                  <p class="asset-description">{{ asset.description }}</p>
+                }
+              </div>
 
-          </article>
-        }
+              <div class="asset-footer">
+                <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">
+                  ✎ Edit
+                </button>
+                <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">
+                  ✕
+                </button>
+              </div>
+
+            </article>
+          }
+        </div>
+      }
+    }
+
+    @if (showSuccess) {
+      <div class="success-overlay">
+        <ng-lottie [options]="successOptions" style="width:180px;height:180px;"></ng-lottie>
       </div>
     }
 

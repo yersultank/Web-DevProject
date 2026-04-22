@@ -1,28 +1,80 @@
 <div class="landing-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="hero-glow hero-glow-left"></div>
+  <div class="hero-glow hero-glow-right"></div>
 
   <main class="shell">
-    <header class="hero">
-      <span class="eyebrow">Asset Platform</span>
-      <h1>AssetTrack</h1>
-      <p>Manage your organization's assets in one place</p>
-
-      <!-- Defense note: *ngIf shows this banner only when a token already exists in localStorage. -->
-      <div class="logged-banner" *ngIf="isLoggedIn">Already logged in</div>
-
-      <a class="cta" routerLink="/login">Get Started</a>
+    <header class="topbar glass-card" aria-label="Primary navigation">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span class="brand-text">AssetOS</span>
+      </a>
+      <a class="topbar-link" [routerLink]="dashboardRoute">
+        {{ isLoggedIn ? 'Dashboard' : 'Login' }}
+      </a>
     </header>
 
+    <section class="hero" aria-label="Hero section">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">Internal Asset Platform</p>
+        <h1>Track Every Asset. Stay in Control.</h1>
+        <p class="hero-subtitle">The internal asset management platform for modern teams.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" [routerLink]="ctaRoute">{{ heroPrimaryLabel }}</a>
+          <a class="btn btn-ghost" [routerLink]="dashboardRoute">{{ dashboardButtonLabel }}</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <img
+          src="assets/images/hero.svg"
+          alt="AssetOS hero preview"
+          onerror="this.style.display = 'none'"
+        />
+      </div>
+    </section>
+
     <section class="features" aria-label="Core features">
-      <!-- Defense note: *ngFor renders one card per item from the TypeScript features array. -->
-      <article class="feature-card" *ngFor="let feature of features; let i = index">
-        <span class="card-number">0{{ i + 1 }}</span>
-        <h2>{{ feature.title }}</h2>
-        <p>{{ feature.description }}</p>
+      <article class="feature-card glass-card">
+        <i data-lucide="database" aria-hidden="true"></i>
+        <h2>Full CRUD</h2>
+        <p>Create, update, and track every company asset with full lifecycle control.</p>
+      </article>
+
+      <article class="feature-card glass-card">
+        <i data-lucide="shield" aria-hidden="true"></i>
+        <h2>JWT Secured</h2>
+        <p>Authentication and API access are protected through token-based security.</p>
+      </article>
+
+      <article class="feature-card glass-card">
+        <i data-lucide="users" aria-hidden="true"></i>
+        <h2>Team Ready</h2>
+        <p>Built for admins and staff to collaborate across departments in one workflow.</p>
       </article>
     </section>
 
-    <footer class="footer">AssetTrack © 2026</footer>
+    <section class="stats glass-card" aria-label="Platform stats">
+      <div class="stat">
+        <span class="stat-value">{{ stats.assets }}</span>
+        <span class="stat-label">{{ assetsLabel }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.departments }}</span>
+        <span class="stat-label">Departments</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.platform }}</span>
+        <span class="stat-label">Platform</span>
+      </div>
+    </section>
+
+    <section class="cta glass-card" aria-label="Call to action">
+      <h2>Ready to get started?</h2>
+      <a class="btn btn-primary" [routerLink]="ctaRoute">{{ ctaLabel }}</a>
+    </section>
+
+    <footer class="footer">
+      <span class="footer-brand">AssetOS</span>
+      <span class="footer-copy">© 2026 AssetOS</span>
+    </footer>
   </main>
 </div>
