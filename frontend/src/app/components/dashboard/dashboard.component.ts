@@ -2,15 +2,13 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 import { AuthService, UserListItem } from '../../services/auth.service';
 import { Asset, Category } from '../../models/asset.model';
-import { LoadingComponent } from '../loading/loading.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, LottieComponent, LoadingComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
@@ -26,11 +24,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loading = false;
   showSuccess = false;
 
-  successOptions: AnimationOptions = {
-    path: 'assets/animations/success_check.json',
-  };
-
-  // ── Add form ──────────────────────────────────────────────────────────────
   showAddForm = false;
 
   newName = '';
@@ -71,6 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   goToProfile(): void { this.router.navigate(['/profile']); }
   goToHistory(): void { this.router.navigate(['/history']); }
+  viewUserProfile(userId: number): void { this.router.navigate(['/user', userId]); }
 
   logout(): void {
     this.authService.logout();
@@ -84,7 +78,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ─── Click 1: Load assets ─────────────────────────────────────────────────
   loadAssets(): void {
     this.loading = true;
     this.loadError = '';
@@ -107,18 +100,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadCategories(): void {
     this.authService.getCategories().subscribe({
-      next: (cats) => {
-        this.categories = cats;
-      },
+      next: (cats) => { this.categories = cats; },
       error: (err) => console.error('Categories load error:', err),
     });
   }
 
   loadUsers(): void {
     this.authService.getUserList().subscribe({
-      next: (users) => {
-        this.userList = users;
-      },
+      next: (users) => { this.userList = users; },
       error: (err) => console.error('Users load error:', err),
     });
   }
@@ -310,9 +299,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private triggerSuccessAnimation(): void {
     this.showSuccess = true;
-    if (this.successTimer) {
-      clearTimeout(this.successTimer);
-    }
+    if (this.successTimer) clearTimeout(this.successTimer);
     this.successTimer = setTimeout(() => {
       this.showSuccess = false;
       this.cdr.markForCheck();

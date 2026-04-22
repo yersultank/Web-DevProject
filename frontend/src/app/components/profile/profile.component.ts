@@ -30,6 +30,10 @@ export class ProfileComponent implements OnInit {
     this.router.navigate([this.profile.is_staff ? '/dashboard' : '/my-assets']);
   }
 
+  goToHistory(): void {
+    this.router.navigate([this.profile.is_staff ? '/history' : '/my-history']);
+  }
+
   loadProfile(): void {
     this.authService.getMyProfile().subscribe({
       next: data => {

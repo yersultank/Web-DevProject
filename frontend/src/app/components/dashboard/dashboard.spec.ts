@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { DashboardComponent } from './dashboard.component';
@@ -29,11 +30,12 @@ describe('Dashboard', () => {
   ];
 
   const authServiceMock = {
-    getAssets: jasmine.createSpy('getAssets').and.returnValue(of(assets)),
-    getCategories: jasmine.createSpy('getCategories').and.returnValue(of([])),
-    createAsset: jasmine.createSpy('createAsset'),
-    deleteAsset: jasmine.createSpy('deleteAsset'),
-    updateAsset: jasmine.createSpy('updateAsset'),
+    getAssets:      vi.fn().mockReturnValue(of(assets)),
+    getCategories:  vi.fn().mockReturnValue(of([])),
+    getUserList:    vi.fn().mockReturnValue(of([])),
+    createAsset:    vi.fn(),
+    deleteAsset:    vi.fn(),
+    updateAsset:    vi.fn(),
   } as Partial<AuthService>;
 
   beforeEach(async () => {

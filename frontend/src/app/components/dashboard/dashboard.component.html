@@ -222,7 +222,10 @@
 
     <!-- ── Asset Grid ── -->
     @if (loading) {
-      <app-loading></app-loading>
+      <div class="empty-state">
+        <div class="empty-icon spin">◈</div>
+        <p>Loading assets…</p>
+      </div>
     } @else {
       @if (filteredAssets.length === 0) {
         <div class="empty-state">
@@ -258,19 +261,22 @@
                   <span class="asset-id">#{{ asset.id }}</span>
                 </div>
                 <h3 class="asset-name">{{ asset.name }}</h3>
-                <p class="asset-sn">{{ asset.serial_number ?? '—' }}</p>
                 @if (asset.description) {
                   <p class="asset-description">{{ asset.description }}</p>
+                }
+                @if (asset.assignee) {
+                  <button class="asset-assignee-btn" (click)="viewUserProfile(asset.assignee.user_id)">
+                    ↗ {{ asset.assignee.username }}
+                  </button>
                 }
               </div>
 
               <div class="asset-footer">
-                <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">
-                  ✎ Edit
-                </button>
-                <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">
-                  ✕
-                </button>
+                <button class="icon-btn edit-btn" (click)="startEdit(asset)" title="Edit">✎ Edit</button>
+                @if (asset.status === 'available') {
+                  <button class="icon-btn assign-btn" (click)="openAssign(asset)">↗ Assign</button>
+                }
+                <button class="icon-btn delete-btn" (click)="deleteAsset(asset.id)" title="Delete">✕</button>
               </div>
 
             </article>
@@ -281,7 +287,7 @@
 
     @if (showSuccess) {
       <div class="success-overlay">
-        <ng-lottie [options]="successOptions" style="width:180px;height:180px;"></ng-lottie>
+        <div class="success-check">✓</div>
       </div>
     }
 

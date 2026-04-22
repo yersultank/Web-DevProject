@@ -1,4 +1,4 @@
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
@@ -196,12 +196,17 @@ def my_profile(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes([permissions.IsAdminUser])
 def user_profile_admin(request, user_id):
     user       = get_object_or_404(User, pk=user_id)
     profile, _ = UserProfile.objects.get_or_create(user=user)
-    return Response(UserProfileAdminSerializer(profile).data)
+    if request.method == 'GET':
+        return Response(UserProfileAdminSerializer(profile).data)
+    serializer = UserProfileAdminSerializer(profile, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -222,15 +227,22 @@ def user_list(request):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def my_asset_history(request):
-    asset_ids = (
+    assignments = list(
         Assignment.objects
         .filter(user=request.user)
-        .values_list('asset_id', flat=True)
-        .distinct()
+        .values('asset_id', 'assigned_at', 'returned_at')
     )
+    if not assignments:
+        return Response([])
+    q = Q()
+    for a in assignments:
+        if a['returned_at']:
+            q |= Q(asset_id=a['asset_id'], changed_at__gte=a['assigned_at'], changed_at__lte=a['returned_at'])
+        else:
+            q |= Q(asset_id=a['asset_id'], changed_at__gte=a['assigned_at'])
     logs = (
         StatusLog.objects
-        .filter(asset_id__in=asset_ids)
+        .filter(q)
         .select_related('asset', 'assigned_to')
         .order_by('-changed_at')
     )

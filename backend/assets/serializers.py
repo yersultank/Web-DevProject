@@ -90,7 +90,7 @@ class AssetSerializer(serializers.ModelSerializer):
             active_list = list(obj.assignments.filter(returned_at__isnull=True).select_related('user'))
         if active_list:
             a = active_list[0]
-            return {'assignment_id': a.id, 'username': a.user.username}
+            return {'assignment_id': a.id, 'user_id': a.user.id, 'username': a.user.username}
         return None
 
 

@@ -11,7 +11,7 @@ export interface Asset {
   status: string;
   category?: number | Category;
   category_name?: string;
-  assignee?: { assignment_id: number; username: string } | null;
+  assignee?: { assignment_id: number; user_id: number; username: string } | null;
   created_at?: string;
   updated_at?: string;
 }

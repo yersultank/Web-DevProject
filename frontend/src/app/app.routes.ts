@@ -38,5 +38,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./components/history/history.component').then(m => m.HistoryComponent)
   },
+  {
+    path: 'user/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/admin-user-profile/admin-user-profile.component').then(m => m.AdminUserProfileComponent)
+  },
   { path: '**', redirectTo: 'login' }
 ];

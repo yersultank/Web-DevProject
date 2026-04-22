@@ -112,4 +112,12 @@ export class AuthService {
   getMyHistory(): Observable<StatusLog[]> {
     return this.http.get<StatusLog[]>(`${this.api}/my-history/`);
   }
+
+  getUserProfile(id: number): Observable<any> {
+    return this.http.get(`${this.api}/users/${id}/profile/`);
+  }
+
+  updateUserProfile(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.api}/users/${id}/profile/`, data);
+  }
 }
