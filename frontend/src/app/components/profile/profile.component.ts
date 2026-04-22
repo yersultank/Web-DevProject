@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ export class ProfileComponent implements OnInit {
   success     = '';
   returningId: number | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.loadProfile(); }
 
@@ -34,13 +34,14 @@ export class ProfileComponent implements OnInit {
     this.authService.getMyProfile().subscribe({
       next: data => {
         this.profile = data;
+        this.cdr.detectChanges();
         if (!data.is_staff) {
           this.authService.getMyAssets().subscribe({
-            next: assets => { this.profile = { ...this.profile, assets }; },
+            next: assets => { this.profile = { ...this.profile, assets }; this.cdr.detectChanges(); },
           });
         }
       },
-      error: () => { this.error = 'Could not load profile.'; },
+      error: () => { this.error = 'Could not load profile.'; this.cdr.detectChanges(); },
     });
   }
 

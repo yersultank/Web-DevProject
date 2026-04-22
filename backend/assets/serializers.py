@@ -85,9 +85,12 @@ class AssetSerializer(serializers.ModelSerializer):
         )
 
     def get_assignee(self, obj):
-        active = obj.assignments.filter(returned_at__isnull=True).select_related('user').first()
-        if active:
-            return {'assignment_id': active.id, 'username': active.user.username}
+        active_list = getattr(obj, 'active_assignments', None)
+        if active_list is None:
+            active_list = list(obj.assignments.filter(returned_at__isnull=True).select_related('user'))
+        if active_list:
+            a = active_list[0]
+            return {'assignment_id': a.id, 'username': a.user.username}
         return None
 
 

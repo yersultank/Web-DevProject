@@ -218,7 +218,12 @@
     </section>
 
     <!-- ── Asset Grid ── -->
-    @if (filteredAssets.length === 0) {
+    @if (isLoading && assets.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon spin">◈</div>
+        <p>Loading assets…</p>
+      </div>
+    } @else if (filteredAssets.length === 0) {
       <div class="empty-state">
         <div class="empty-icon">◈</div>
         @if (assets.length > 0) {

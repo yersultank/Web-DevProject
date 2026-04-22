@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
@@ -45,7 +45,14 @@ class AssetViewSet(viewsets.ModelViewSet):
     queryset = (
         Asset.objects
         .select_related('category')
-        .prefetch_related('assignments__user', 'condition_reports')
+        .prefetch_related(
+            Prefetch(
+                'assignments',
+                queryset=Assignment.objects.filter(returned_at__isnull=True).select_related('user'),
+                to_attr='active_assignments',
+            ),
+            'condition_reports',
+        )
         .order_by('id')
     )
     permission_classes = [permissions.IsAdminUser]
