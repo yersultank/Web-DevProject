@@ -29,6 +29,9 @@
     @if (error) {
       <div class="alert alert-error">⚠ {{ error }}</div>
     }
+    @if (returnError) {
+      <div class="alert alert-error">⚠ {{ returnError }}</div>
+    }
 
     @if (assets.length === 0) {
       <div class="empty-state">
@@ -56,6 +59,15 @@
                 <p class="asset-description">{{ asset.description }}</p>
               }
               <p class="asset-date">Assigned: {{ asset.assigned_at | date:'mediumDate' }}</p>
+            </div>
+            <div class="asset-footer">
+              <button
+                class="icon-btn return-btn"
+                (click)="returnAsset(asset.id)"
+                [disabled]="returningId === asset.id"
+                title="Return this asset">
+                {{ returningId === asset.id ? 'Returning…' : '↩ Return' }}
+              </button>
             </div>
           </article>
         }

@@ -271,3 +271,20 @@
 
 .spin { display: inline-block; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Asset footer & return button ────────────────────────────────────────── */
+.asset-footer {
+  display: flex; justify-content: flex-end; align-items: center;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.icon-btn {
+  padding: 6px 12px; border-radius: 6px; border: none;
+  cursor: pointer; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: all 0.15s; background: transparent;
+}
+.return-btn { color: #f59e0b; }
+.return-btn:hover:not(:disabled) { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.return-btn:disabled { opacity: 0.5; cursor: not-allowed; }

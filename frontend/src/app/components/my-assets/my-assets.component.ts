@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MyAsset } from '../../models/user-profile.model';
 
 @Component({
   selector: 'app-my-assets',
@@ -11,20 +12,39 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './my-assets.component.css',
 })
 export class MyAssetsComponent implements OnInit {
-  assets: any[] = [];
-  error = '';
+  assets:      MyAsset[] = [];
+  error        = '';
+  returningId: number | null = null;
+  returnError  = '';
+
   readonly baseUrl = 'http://127.0.0.1:8000';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void { this.loadMyAssets(); }
-  
 
   loadMyAssets(): void {
     this.error = '';
     this.authService.getMyAssets().subscribe({
-      next:  (data) => { this.assets = data; },
-      error: ()     => { this.error = 'Could not load your assets.'; }
+      next:  data => { this.assets = data; },
+      error: ()   => { this.error = 'Could not load your assets.'; },
+    });
+  }
+
+  returnAsset(assignmentId: number): void {
+    if (this.returningId !== null) return;
+    this.returningId = assignmentId;
+    this.returnError = '';
+
+    this.authService.returnAsset(assignmentId).subscribe({
+      next: () => {
+        this.returningId = null;
+        this.loadMyAssets();
+      },
+      error: () => {
+        this.returningId = null;
+        this.returnError = 'Could not return the asset. Please try again.';
+      },
     });
   }
 
@@ -35,7 +55,7 @@ export class MyAssetsComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  getImage(asset: any): string {
+  getImage(asset: MyAsset): string {
     if (asset.image) {
       return asset.image.startsWith('http') ? asset.image : `${this.baseUrl}${asset.image}`;
     }
