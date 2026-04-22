@@ -3,7 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Asset, Category } from '../models/asset.model';
 import { AuthResponse, LoginCredentials } from '../models/user.model';
-import { UserProfile } from '../models/user-profile.model';
+import { UserProfile, MyAsset } from '../models/user-profile.model';
+
+export interface UserListItem {
+  id: number;
+  username: string;
+  full_name: string;
+}
+
+export interface AssignPayload {
+  asset: number;
+  user: number;
+  notes?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,7 +23,6 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // ── Auth 
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.api}/token/`, credentials).pipe(
       tap(res => {
@@ -22,8 +33,8 @@ export class AuthService {
     );
   }
 
-  register(credentials: LoginCredentials): Observable<any> {
-    return this.http.post(`${this.api}/register/`, credentials);
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.api}/register/`, userData);
   }
 
   logout(): void {
@@ -37,8 +48,6 @@ export class AuthService {
   isLoggedIn(): boolean { return !!localStorage.getItem('access_token'); }
   isAdmin():    boolean { return localStorage.getItem('is_staff') === 'true'; }
 
-  // ── Assets ────────────────────────────────────────────────────────────────
-
   getAssets(): Observable<Asset[]> {
     return this.http.get<Asset[]>(`${this.api}/assets/`);
   }
@@ -48,7 +57,7 @@ export class AuthService {
   }
 
   updateAsset(id: number, data: FormData): Observable<Asset> {
-    return this.http.put<Asset>(`${this.api}/assets/${id}/`, data);
+    return this.http.patch<Asset>(`${this.api}/assets/${id}/`, data);
   }
 
   deleteAsset(id: number): Observable<void> {
@@ -59,13 +68,17 @@ export class AuthService {
     return this.http.get<Category[]>(`${this.api}/categories/`);
   }
 
-  // ── My Assets (for user)
-
-  getMyAssets(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/my-assets/`);
+  assignAsset(payload: AssignPayload): Observable<any> {
+    return this.http.post(`${this.api}/assign/`, payload);
   }
 
-  // ── Profile
+  returnAsset(assignmentId: number): Observable<any> {
+    return this.http.post(`${this.api}/assignments/${assignmentId}/return/`, {});
+  }
+
+  getMyAssets(): Observable<MyAsset[]> {
+    return this.http.get<MyAsset[]>(`${this.api}/my-assets/`);
+  }
 
   getMyProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.api}/profile/`);
@@ -73,5 +86,9 @@ export class AuthService {
 
   updateMyProfile(data: Partial<UserProfile>): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.api}/profile/`, data);
+  }
+
+  getUserList(): Observable<UserListItem[]> {
+    return this.http.get<UserListItem[]>(`${this.api}/users/`);
   }
 }
