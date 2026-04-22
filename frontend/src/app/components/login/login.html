@@ -1,5 +1,13 @@
-<div class="auth-bg">
-  <div class="auth-card" [class.auth-card--wide]="!isLoginMode">
+<div class="login-shell">
+  <section class="brand-panel" aria-hidden="true">
+    <div class="brand-grid-overlay"></div>
+    <div class="brand-content">
+      <p class="brand-eyebrow">Asset Platform</p>
+      <h1>AssetOS</h1>
+      <p class="brand-tagline">Track, manage, and assign your company assets — all in one place.</p>
+      <img src="assets/images/login.svg" class="auth-illustration" alt="" onerror="this.style.display='none'" />
+    </div>
+  </section>
 
     <div class="auth-logo">◈</div>
     <h2 class="auth-title">{{ isLoginMode ? 'Sign In' : 'Create Account' }}</h2>

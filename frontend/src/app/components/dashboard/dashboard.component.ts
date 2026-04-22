@@ -1,25 +1,34 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService, UserListItem } from '../../services/auth.service';
+import { AnimationOptions, LottieComponent } from 'ngx-lottie';
+import { AuthService } from '../../services/auth.service';
 import { Asset, Category } from '../../models/asset.model';
+import { LoadingComponent } from '../loading/loading.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LottieComponent, LoadingComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent implements OnInit {
-  assets:         Asset[]        = [];
-  filteredAssets: Asset[]        = [];
-  categories:     Category[]     = [];
-  userList:       UserListItem[] = [];
+export class DashboardComponent implements OnInit, OnDestroy {
+  userName = 'Admin User';
+  userRole = 'admin';
 
-  isLoading   = false;
-  loadError   = '';
+  assets: Asset[] = [];
+  filteredAssets: Asset[] = [];
+  categories: Category[] = [];
+  loadError = '';
+  loading = false;
+  showSuccess = false;
+
+  successOptions: AnimationOptions = {
+    path: 'assets/animations/success_check.json',
+  };
+
+  // ── Add form ──────────────────────────────────────────────────────────────
   showAddForm = false;
 
   newName        = '';
@@ -43,7 +52,8 @@ export class DashboardComponent implements OnInit {
   filterCategory: number | string = '';
 
   readonly statusOptions = ['available', 'assigned', 'maintenance', 'retired'];
-  readonly baseUrl       = 'http://127.0.0.1:8000';
+  readonly baseUrl = 'http://127.0.0.1:8000';
+  private successTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
@@ -60,20 +70,31 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  ngOnDestroy(): void {
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+      this.successTimer = null;
+    }
+  }
+
+  // ─── Click 1: Load assets ─────────────────────────────────────────────────
   loadAssets(): void {
     this.isLoading = true;
     this.loadError = '';
+    this.loading = true;
     this.authService.getAssets().subscribe({
       next: assets => {
         this.assets = assets;
         this.applyFilters();
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: err => {
-        this.isLoading = false;
-        this.loadError = err.error?.detail ?? 'Could not load assets. Is the server running?';
-        this.cdr.detectChanges();
+      error: () => {
+        this.assets = [];
+        this.filteredAssets = [];
+        this.loadError = 'Could not load assets. Please try again.';
+        this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -116,7 +137,8 @@ export class DashboardComponent implements OnInit {
       next:  created => {
         this.assets = [...this.assets, created];
         this.applyFilters();
-        this.resetAddForm();
+        this.resetForm();
+        this.triggerSuccessAnimation();
       },
       error: err => {
         this.loadError = err.error?.detail ?? 'Failed to create asset.';
@@ -167,6 +189,8 @@ export class DashboardComponent implements OnInit {
         this.assets = this.assets.map(a => a.id === updated.id ? updated : a);
         this.applyFilters();
         this.editingAsset = null;
+        this.editingImage = null;
+        this.triggerSuccessAnimation();
       },
       error: err => {
         this.editError = err.error ? JSON.stringify(err.error) : 'Failed to save changes.';
@@ -246,5 +270,16 @@ export class DashboardComponent implements OnInit {
       peripheral: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80',
     };
     return fallbacks[cat] ?? 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80';
+  }
+
+  private triggerSuccessAnimation(): void {
+    this.showSuccess = true;
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+    }
+    this.successTimer = setTimeout(() => {
+      this.showSuccess = false;
+      this.cdr.markForCheck();
+    }, 2500);
   }
 }

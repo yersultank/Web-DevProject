@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -9,16 +9,16 @@ import { RouterLink } from '@angular/router';
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class LandingComponent implements OnInit {
-  features = [
-    { title: 'Track Assets', description: 'Manage all company equipment' },
-    { title: 'Assign Resources', description: 'Assign assets to employees' },
-    { title: 'Monitor Conditions', description: 'Log asset condition reports' }
-  ];
+export class LandingComponent implements AfterViewInit {
+  ngAfterViewInit(): void {
+    this.renderLucideIcons();
+    setTimeout(() => this.renderLucideIcons(), 120);
+  }
 
-  isLoggedIn = false;
-
-  ngOnInit(): void {
-    this.isLoggedIn = !!localStorage.getItem('access_token');
+  private renderLucideIcons(): void {
+    const lucide = (window as any).lucide;
+    if (lucide?.createIcons) {
+      lucide.createIcons();
+    }
   }
 }
