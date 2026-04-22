@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrl: './landing.component.css',
 })
 export class LandingComponent implements AfterViewInit, OnInit {
   isLoggedIn = false;
@@ -17,7 +17,7 @@ export class LandingComponent implements AfterViewInit, OnInit {
   stats = {
     assets: '--',
     departments: '--',
-    platform: '1'
+    platform: '1',
   };
 
   constructor(private authService: AuthService) {}

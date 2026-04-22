@@ -117,7 +117,9 @@
   border-radius: 10px;
   padding: 0.58rem 0.86rem;
   background: rgba(255, 255, 255, 0.08);
-  transition: background 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .topbar-link:hover {
@@ -191,7 +193,10 @@
   font-size: 0.88rem;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
 }
 
 .btn:hover {
@@ -239,9 +244,15 @@
   animation: rise-in 0.6s ease-out both;
 }
 
-.feature-card:nth-child(1) { animation-delay: 60ms; }
-.feature-card:nth-child(2) { animation-delay: 130ms; }
-.feature-card:nth-child(3) { animation-delay: 200ms; }
+.feature-card:nth-child(1) {
+  animation-delay: 60ms;
+}
+.feature-card:nth-child(2) {
+  animation-delay: 130ms;
+}
+.feature-card:nth-child(3) {
+  animation-delay: 200ms;
+}
 
 .feature-card i {
   display: inline-flex;
