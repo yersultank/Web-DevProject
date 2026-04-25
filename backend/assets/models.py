@@ -134,3 +134,21 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.user.username}: {self.type}'
+
+class ToxicSettings(models.Model):
+    """Singleton — only one row ever exists"""
+    enabled = models.BooleanField(default=True)
+    trigger_tab_leave = models.BooleanField(default=True)
+    trigger_late_submit = models.BooleanField(default=True)
+
+    def __str__(self):
+        return 'Toxic Settings'
+
+
+class ToxicMessage(models.Model):
+    TRIGGER = [('tab_leave', 'Tab Leave'), ('late_submit', 'Late Submit')]
+    trigger = models.CharField(choices=TRIGGER, max_length=20)
+    text = models.TextField()
+
+    def __str__(self):
+        return f'{self.trigger}: {self.text[:40]}'
