@@ -65,3 +65,72 @@ class Submission(models.Model):
 
     def __str__(self):
         return f'{self.student.username} → {self.assignment.title}'
+    
+class ChatMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    text = models.TextField(blank=True)
+    file = models.FileField(upload_to='chat_files/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('created_at',)
+
+    def __str__(self):
+        return f'{self.sender.username} → {self.recipient.username}'
+
+
+class SubmissionComment(models.Model):
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='comments')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('created_at',)
+
+    def __str__(self):
+        return f'Comment on {self.submission}'
+
+
+class Announcement(models.Model):
+    text = models.TextField()
+    photo = models.ImageField(upload_to='announcements/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return self.text[:50]
+
+
+class AnnouncementRead(models.Model):
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('announcement', 'user')
+
+
+class Notification(models.Model):
+    TYPE = [
+        ('chat', 'Chat'),
+        ('toxic', 'Toxic'),
+        ('announcement', 'Announcement'),
+        ('assignment', 'Assignment'),
+        ('lesson', 'Lesson'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(choices=TYPE, max_length=20)
+    text = models.TextField()
+    link = models.CharField(max_length=255, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.type}'
