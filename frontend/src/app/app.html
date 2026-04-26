@@ -1,1 +1,59 @@
-<router-outlet></router-outlet>
+<div class="shell">
+  <!-- Sidebar -->
+  @if (showSidebar) {
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h2>🎓 JS Course</h2>
+        <div class="course-name">{{ courseName }}</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        @if (isAdmin) {
+          @for (item of adminNav; track item.path) {
+            <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+              <span class="nav-icon">{{ item.icon }}</span>
+              {{ item.label }}
+              @if (item.badge && getBadge(item.badge) > 0) {
+                <span class="nav-badge">{{ getBadge(item.badge) }}</span>
+              }
+            </a>
+          }
+        } @else {
+          @for (item of studentNav; track item.path) {
+            <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+              <span class="nav-icon">{{ item.icon }}</span>
+              {{ item.label }}
+              @if (item.badge && getBadge(item.badge) > 0) {
+                <span class="nav-badge">{{ getBadge(item.badge) }}</span>
+              }
+            </a>
+          }
+        }
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ initials }}</div>
+        <div class="user-info">
+          <div class="name">{{ username }}</div>
+          <div class="role">{{ isAdmin ? 'Admin' : 'Student' }}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" (click)="logout()" title="Logout">↪</button>
+      </div>
+    </aside>
+  }
+
+  <!-- Main content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-container">
+  @for (toast of toasts; track toast.id) {
+    <div class="toast" [class]="'toast-' + toast.type">
+      @if (toast.type === 'toxic') { ⚠️ }
+      {{ toast.text }}
+    </div>
+  }
+</div>
