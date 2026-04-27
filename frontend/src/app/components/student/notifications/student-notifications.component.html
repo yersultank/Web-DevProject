@@ -1,0 +1,24 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">🔔 Notifications</h1>
+    <button class="btn btn-ghost btn-sm" (click)="markAllRead()">Mark all read</button>
+  </div>
+
+  @if (loading) { <div style="color:var(--text-muted)">Loading…</div> }
+
+  <div class="notif-list">
+    @for (n of notifications; track n.id) {
+      <div class="notif-item" [class.toxic]="n.type==='toxic'" [class.unread]="!n.is_read" (click)="navigate(n.link)">
+        <span class="notif-icon">{{ icon(n.type) }}</span>
+        <div class="notif-body">
+          <div class="notif-text">{{ n.text }}</div>
+          <div class="notif-time">{{ n.created_at | date:'dd MMM, HH:mm' }}</div>
+        </div>
+        @if (!n.is_read) { <span class="unread-dot"></span> }
+      </div>
+    }
+    @if (!loading && !notifications.length) {
+      <div style="color:var(--text-muted);font-size:14px;padding:20px 0">No notifications yet.</div>
+    }
+  </div>
+</div>

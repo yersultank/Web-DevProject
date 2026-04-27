@@ -1,0 +1,18 @@
+<div class="page">
+  <div class="page-header"><h1 class="page-title">📢 News & Announcements</h1></div>
+  @if (loading) { <div style="color:var(--text-muted)">Loading…</div> }
+  <div class="news-list">
+    @for (a of announcements; track a.id) {
+      <div class="news-card card">
+        @if (a.photo_url) {
+          <img [src]="a.photo_url" class="news-photo" alt="announcement" />
+        }
+        <div class="news-text">{{ a.text }}</div>
+        <div class="news-date">📅 {{ a.created_at | date:'dd MMM yyyy, HH:mm' }}</div>
+      </div>
+    }
+    @if (!loading && !announcements.length) {
+      <div style="color:var(--text-muted);font-size:14px">No announcements yet.</div>
+    }
+  </div>
+</div>

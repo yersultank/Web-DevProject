@@ -1,0 +1,39 @@
+<div class="course-layout">
+  <!-- Left: Topic tree -->
+  <aside class="topic-tree">
+    <div class="tree-header">Course Content</div>
+    @if (loading) { <div class="tree-loading">Loading…</div> }
+    @if (course) {
+      @for (topic of course.topics; track topic.id) {
+        <div class="topic-row" (click)="toggleTopic(topic)">
+          <span class="chevron">{{ expandedTopics.has(topic.id) ? '▼' : '▶' }}</span>
+          <span class="topic-title">{{ topic.title }}</span>
+        </div>
+        @if (expandedTopics.has(topic.id)) {
+          @for (lesson of topic.lessons; track lesson.id) {
+            <div class="lesson-row"
+                 [class.active]="selectedLesson?.id === lesson.id"
+                 (click)="selectLesson(lesson)">
+              📄 {{ lesson.title }}
+            </div>
+          }
+        }
+      }
+    }
+  </aside>
+
+  <!-- Right: Lesson content -->
+  <main class="lesson-panel">
+    @if (selectedLesson) {
+      <h2 class="lesson-title">{{ selectedLesson.title }}</h2>
+      <div class="lesson-content" [innerHTML]="lessonContent"></div>
+      @if (selectedLesson.assignment_id) {
+        <div class="assignment-cta">
+          <button class="btn btn-primary" (click)="goToAssignment()">📝 Go to Assignment</button>
+        </div>
+      }
+    } @else {
+      <div class="no-lesson">Select a lesson from the left panel</div>
+    }
+  </main>
+</div>

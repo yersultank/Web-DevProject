@@ -1,0 +1,24 @@
+.detail-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.description { color: var(--text-secondary); line-height: 1.6; }
+.answer-section { margin-bottom: 20px; }
+.section-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; }
+.code-editor { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; background: #0d0d1a; }
+.code-editor-ro { font-family: 'Courier New', monospace; font-size: 13px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; white-space: pre-wrap; }
+.code-output { background: #0a0a15; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 13px; margin-top: 8px; color: var(--success); white-space: pre-wrap; }
+.error-msg { color: var(--danger); font-size: 13px; margin-bottom: 12px; }
+.status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.submitted-at { font-size: 12px; color: var(--text-muted); }
+.score-section { margin-top: 16px; padding: 16px; background: var(--bg-primary); border-radius: 8px; }
+.score-value { font-size: 40px; font-weight: 700; color: var(--success); }
+.score-value span { font-size: 20px; color: var(--text-muted); }
+.feedback { color: var(--text-secondary); margin-top: 8px; font-size: 14px; line-height: 1.5; }
+.chat-section { }
+.chat-messages { max-height: 300px; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+.chat-msg { display: flex; flex-direction: column; max-width: 60%; }
+.chat-msg.own { align-self: flex-end; align-items: flex-end; }
+.msg-author { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+.msg-bubble { background: var(--bg-hover); padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+.chat-msg.own .msg-bubble { background: var(--accent); }
+.msg-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.chat-input-row { display: flex; gap: 8px; }
+.loading-text { padding: 40px; color: var(--text-muted); text-align: center; }

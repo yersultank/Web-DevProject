@@ -1,0 +1,56 @@
+<div class="page">
+  @if (profile) {
+    <div class="profile-header">
+      <div class="avatar-large">{{ initials }}</div>
+      <div>
+        <div class="profile-name">{{ profile.full_name || profile.username }}</div>
+        <div class="profile-username">@{{ profile.username }}</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">{{ profile.submitted }}<span class="stat-total">/{{ profile.total }}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Score</div>
+        <div class="stat-value">{{ profile.avg_score ?? '—' }}<span class="stat-total">/100</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Overdue</div>
+        <div class="stat-value" [style.color]="profile.overdue > 0 ? 'var(--danger)' : ''">{{ profile.overdue }}</div>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:480px">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:20px">Edit Profile</h3>
+
+      @if (msg) { <div class="success-msg">✓ {{ msg }}</div> }
+      @if (error) { <div class="error-msg">⚠ {{ error }}</div> }
+
+      <div class="form-group">
+        <label class="label">Full Name</label>
+        <input class="input" [(ngModel)]="fullName" placeholder="Your full name" />
+      </div>
+
+      <h4 style="font-size:13px;color:var(--text-muted);margin:20px 0 12px">Change Password</h4>
+      <div class="form-group">
+        <label class="label">Current Password</label>
+        <input class="input" type="password" [(ngModel)]="currentPassword" />
+      </div>
+      <div class="form-group">
+        <label class="label">New Password</label>
+        <input class="input" type="password" [(ngModel)]="newPassword" />
+      </div>
+      <div class="form-group">
+        <label class="label">Confirm New Password</label>
+        <input class="input" type="password" [(ngModel)]="confirmPassword" />
+      </div>
+
+      <button class="btn btn-primary" [disabled]="saving" (click)="saveProfile()">
+        {{ saving ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  }
+</div>

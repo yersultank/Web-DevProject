@@ -1,0 +1,40 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">My Assignments</h1>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-item" [class.active]="activeTab==='upcoming'" (click)="activeTab='upcoming'">
+      Upcoming <span class="tab-count">{{ upcoming.length }}</span>
+    </div>
+    <div class="tab-item" [class.active]="activeTab==='completed'" (click)="activeTab='completed'">
+      Completed <span class="tab-count">{{ completed.length }}</span>
+    </div>
+    <div class="tab-item" [class.active]="activeTab==='overdue'" (click)="activeTab='overdue'">
+      Overdue <span class="tab-count">{{ overdue.length }}</span>
+    </div>
+  </div>
+
+  @if (loading) { <div class="loading-text">Loading…</div> }
+
+  <div class="cards-grid">
+    @for (a of current; track a.id) {
+      <div class="assignment-card" (click)="open(a)">
+        <div class="card-top">
+          <span class="card-title">{{ a.title }}</span>
+          <span class="badge" [class]="'badge-' + a.status">{{ a.status }}</span>
+        </div>
+        <div class="card-deadline" [class.overdue-text]="isOverdue(a.deadline) && a.status !== 'reviewed'">
+          📅 {{ a.deadline | date:'dd MMM yyyy, HH:mm' }}
+        </div>
+        @if (a.score !== null) {
+          <div class="card-score">Score: <strong>{{ a.score }}/100</strong></div>
+        }
+        @if (a.is_late) { <span class="badge badge-late" style="margin-top:8px">Late</span> }
+      </div>
+    }
+    @if (!loading && current.length === 0) {
+      <div class="empty-state">No assignments in this category.</div>
+    }
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<div class="page">
+@if (loading) { <div class="loading-text">Loading…</div> }
+@if (!loading && assignment) {
+  <div class="detail-header">
+    <h1 class="page-title">{{ assignment.title }}</h1>
+    <span class="badge" [class]="isOverdue && assignment.status !== 'reviewed' ? 'badge-overdue' : 'badge-' + assignment.status">
+      📅 {{ assignment.deadline | date:'dd MMM yyyy, HH:mm' }}
+      {{ isOverdue && assignment.status !== 'reviewed' ? ' — OVERDUE' : '' }}
+    </span>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <p class="description">{{ assignment.description }}</p>
+  </div>
+
+  @if (!submission) {
+    <div class="card answer-section">
+      <h3 class="section-title">── Your Answer ──</h3>
+
+      <div class="form-group">
+        <label class="label">Text Answer</label>
+        <textarea class="textarea" [(ngModel)]="textAnswer" placeholder="Write your answer here…" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="label">File Upload</label>
+        <input type="file" class="input" (change)="onFileChange($event)" />
+      </div>
+
+      <div class="form-group">
+        <label class="label">Code (JavaScript)</label>
+        <textarea class="textarea code-editor" [(ngModel)]="codeAnswer" placeholder="// Write your JS code here" rows="10" spellcheck="false"></textarea>
+        <button class="btn btn-ghost" style="margin-top:8px" (click)="runCode()">▶ Run</button>
+        @if (codeOutput) {
+          <pre class="code-output">{{ codeOutput }}</pre>
+        }
+      </div>
+
+      @if (submitError) { <div class="error-msg">{{ submitError }}</div> }
+
+      <button class="btn btn-primary" [disabled]="submitting" (click)="submit()">
+        {{ submitting ? 'Submitting…' : 'Submit Assignment' }}
+      </button>
+    </div>
+  } @else {
+    <div class="card" style="margin-bottom:20px">
+      <h3 class="section-title">── Your Submission ──</h3>
+      <div class="status-row">
+        <span class="badge badge-{{ submission.status }}">{{ submission.status }}</span>
+        @if (submission.is_late) { <span class="badge badge-late">Late</span> }
+        <span class="submitted-at">Submitted {{ submission.submitted_at | date:'dd MMM, HH:mm' }}</span>
+      </div>
+
+      @if (submission.status === 'reviewed') {
+        <div class="score-section">
+          <div class="score-value">{{ submission.score }}<span>/100</span></div>
+          @if (submission.feedback) {
+            <p class="feedback">{{ submission.feedback }}</p>
+          }
+        </div>
+      }
+
+      @if (submission.code_answer) {
+        <div class="form-group" style="margin-top:16px">
+          <label class="label">Your Code</label>
+          <pre class="code-editor-ro">{{ submission.code_answer }}</pre>
+          <button class="btn btn-ghost btn-sm" (click)="codeAnswer=submission.code_answer; runCode()">▶ Run again</button>
+          @if (codeOutput) { <pre class="code-output">{{ codeOutput }}</pre> }
+        </div>
+      }
+    </div>
+
+    <!-- Discussion chat -->
+    <div class="card chat-section">
+      <h3 class="section-title">── Discussion ──</h3>
+      <div class="chat-messages">
+        @for (msg of chatMessages; track msg.id) {
+          <div class="chat-msg" [class.own]="msg.sender_id === userId">
+            <span class="msg-author">{{ msg.sender_name }}</span>
+            <div class="msg-bubble">{{ msg.text }}</div>
+            <span class="msg-time">{{ msg.created_at | date:'HH:mm' }}</span>
+          </div>
+        }
+      </div>
+      <div class="chat-input-row">
+        <input class="input" [(ngModel)]="chatText" placeholder="Type a message…" (keydown.enter)="sendChat()" />
+        <button class="btn btn-primary btn-sm" (click)="sendChat()">Send</button>
+      </div>
+    </div>
+  }
+}
+</div>

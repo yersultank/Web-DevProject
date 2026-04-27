@@ -1,0 +1,23 @@
+<div class="chat-page">
+  <div class="chat-header"><h2>💬 Chat with Admin</h2></div>
+
+  <div class="messages-area">
+    @for (msg of messages; track msg.id) {
+      <div class="msg-row" [class.own]="msg.sender_id === userId">
+        <div class="msg-bubble">
+          <div class="msg-text">{{ msg.text }}</div>
+          <div class="msg-time">{{ msg.created_at | date:'HH:mm' }}</div>
+        </div>
+      </div>
+    }
+    @if (!messages.length) {
+      <div class="empty-chat">No messages yet. Say hi! 👋</div>
+    }
+    <div #msgEnd></div>
+  </div>
+
+  <div class="chat-input-bar">
+    <input class="input" [(ngModel)]="text" placeholder="Type a message…" (keydown.enter)="send()" />
+    <button class="btn btn-primary" (click)="send()">Send</button>
+  </div>
+</div>
