@@ -1,0 +1,25 @@
+.review-layout { display: flex; height: calc(100vh - 0px); overflow: hidden; }
+.review-list { width: 300px; flex-shrink: 0; background: var(--bg-secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.sub-list { flex: 1; overflow-y: auto; }
+.sub-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+.sub-item:hover { background: var(--bg-hover); }
+.sub-item.active { background: rgba(98,100,167,0.15); border-left: 3px solid var(--accent); }
+.sub-name { font-size: 14px; font-weight: 500; }
+.sub-assignment { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.sub-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.late-text { color: var(--danger) !important; }
+.empty-list { padding: 20px 16px; font-size: 13px; color: var(--text-muted); }
+.review-panel { flex: 1; overflow-y: auto; padding: 24px; }
+.review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.review-title { font-size: 18px; font-weight: 600; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.code-block { font-family: monospace; font-size: 13px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; white-space: pre-wrap; color: var(--text-secondary); }
+.code-output { background: #0a0a15; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 13px; margin-top: 8px; color: var(--success); white-space: pre-wrap; }
+.chat-messages { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.chat-msg { display: flex; flex-direction: column; max-width: 70%; }
+.chat-msg.own { align-self: flex-end; align-items: flex-end; }
+.msg-author { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+.msg-bubble { background: var(--bg-hover); padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+.chat-msg.own .msg-bubble { background: var(--accent); }
+.chat-input-row { display: flex; gap: 8px; }
+.no-selection { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 14px; }

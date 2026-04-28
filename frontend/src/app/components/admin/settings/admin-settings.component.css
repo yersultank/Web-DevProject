@@ -1,0 +1,14 @@
+.settings-section { }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.toggle-row:last-of-type { border-bottom: none; }
+.toggle-label { font-size: 14px; }
+.toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background: var(--border); border-radius: 22px; transition: 0.2s; }
+.slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+.toggle-switch input:checked + .slider { background: var(--accent); }
+.toggle-switch input:checked + .slider:before { transform: translateX(18px); }
+.msg-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(58,58,92,0.4); }
+.msg-text { flex: 1; font-size: 13px; color: var(--text-secondary); }
+.add-msg-row { display: flex; gap: 8px; margin-top: 12px; }

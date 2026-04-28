@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-header"><h1 class="page-title">📢 Announcements</h1></div>
+
+  <!-- Create form -->
+  <div class="card" style="max-width:680px;margin-bottom:28px">
+    <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">New Announcement</h3>
+    <div class="form-group">
+      <label class="label">Message</label>
+      <textarea class="textarea" [(ngModel)]="text" rows="3" placeholder="Write your announcement…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="label">Photo (optional)</label>
+      <input type="file" class="input" accept="image/*" (change)="onFileChange($event)" />
+    </div>
+    <button class="btn btn-primary" [disabled]="sending || !text.trim()" (click)="send()">
+      {{ sending ? 'Sending…' : '📢 Send to All Students' }}
+    </button>
+  </div>
+
+  <!-- History -->
+  <h3 style="font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text-muted)">HISTORY</h3>
+  <div class="ann-list">
+    @for (a of announcements; track a.id) {
+      <div class="ann-card card">
+        @if (a.photo_url) {
+          <img [src]="a.photo_url" class="ann-photo" alt="" />
+        }
+        <div class="ann-body">
+          <p class="ann-text">{{ a.text }}</p>
+          <div class="ann-meta">
+            <span>📅 {{ a.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+            <span class="read-count">👁 {{ a.read_count }}/{{ a.total_students }} students read</span>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" (click)="confirmDelete(a.id)">Delete</button>
+      </div>
+    }
+    @if (!announcements.length) {
+      <div style="color:var(--text-muted);font-size:14px">No announcements yet.</div>
+    }
+  </div>
+</div>
+
+@if (showDeleteModal) {
+  <div class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-title">Delete Announcement?</div>
+      <p style="color:var(--text-secondary);font-size:14px">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" (click)="showDeleteModal=false">Cancel</button>
+        <button class="btn btn-danger" (click)="doDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}

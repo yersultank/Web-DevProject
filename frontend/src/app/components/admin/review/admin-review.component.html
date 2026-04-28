@@ -1,0 +1,95 @@
+<div class="review-layout">
+  <!-- Left list -->
+  <aside class="review-list">
+    <div class="tabs" style="padding:0 12px">
+      <div class="tab-item" [class.active]="activeTab==='pending'" (click)="activeTab='pending'">Pending</div>
+      <div class="tab-item" [class.active]="activeTab==='all'" (click)="activeTab='all'">All</div>
+      <div class="tab-item" [class.active]="activeTab==='reviewed'" (click)="activeTab='reviewed'">Reviewed</div>
+    </div>
+    <div class="sub-list">
+      @for (s of filtered; track s.id) {
+        <div class="sub-item" [class.active]="selected?.id===s.id" (click)="select(s)">
+          <div class="sub-name" [class.late-text]="s.is_late">{{ s.student_name }}</div>
+          <div class="sub-assignment">{{ s.assignment?.title }}</div>
+          <div class="sub-date">{{ s.submitted_at | date:'dd MMM, HH:mm' }}</div>
+          @if (s.is_late) { <span class="badge badge-late" style="font-size:10px">Late</span> }
+        </div>
+      }
+      @if (!filtered.length) { <div class="empty-list">No submissions here.</div> }
+    </div>
+  </aside>
+
+  <!-- Right panel -->
+  <main class="review-panel">
+    @if (selected) {
+      <div class="review-header">
+        <div>
+          <h2 class="review-title">{{ selected.student_name }}</h2>
+          <div style="font-size:13px;color:var(--text-muted)">{{ selected.assignment?.title }}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-{{ selected.status }}">{{ selected.status }}</span>
+          @if (selected.is_late) { <span class="badge badge-late">Late</span> }
+        </div>
+      </div>
+
+      @if (selected.text_answer) {
+        <div class="card" style="margin-bottom:16px">
+          <div class="field-label">Text Answer</div>
+          <p style="color:var(--text-secondary);font-size:14px;line-height:1.6">{{ selected.text_answer }}</p>
+        </div>
+      }
+
+      @if (selected.file_answer) {
+        <div class="card" style="margin-bottom:16px">
+          <div class="field-label">File</div>
+          <a [href]="selected.file_answer" target="_blank" class="btn btn-ghost btn-sm">⬇ Download File</a>
+        </div>
+      }
+
+      @if (selected.code_answer) {
+        <div class="card" style="margin-bottom:16px">
+          <div class="field-label">Code Answer</div>
+          <pre class="code-block">{{ selected.code_answer }}</pre>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px" (click)="runCode()">▶ Run</button>
+          @if (codeOutput) { <pre class="code-output">{{ codeOutput }}</pre> }
+        </div>
+      }
+
+      <!-- Review form -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="field-label">Review</div>
+        <div class="form-group">
+          <label class="label">Score (0–100)</label>
+          <input class="input" type="number" min="0" max="100" [(ngModel)]="score" style="max-width:120px" />
+        </div>
+        <div class="form-group">
+          <label class="label">Feedback</label>
+          <textarea class="textarea" [(ngModel)]="feedback" rows="3" placeholder="Leave feedback for the student…"></textarea>
+        </div>
+        <button class="btn btn-primary" [disabled]="submitting || score===null" (click)="submitReview()">
+          {{ submitting ? 'Submitting…' : 'Submit Review' }}
+        </button>
+      </div>
+
+      <!-- Discussion -->
+      <div class="card">
+        <div class="field-label">Discussion</div>
+        <div class="chat-messages">
+          @for (m of chatMessages; track m.id) {
+            <div class="chat-msg" [class.own]="m.sender_id === userId">
+              <span class="msg-author">{{ m.sender_name }}</span>
+              <div class="msg-bubble">{{ m.text }}</div>
+            </div>
+          }
+        </div>
+        <div class="chat-input-row">
+          <input class="input" [(ngModel)]="chatText" placeholder="Type…" (keydown.enter)="sendChat()" />
+          <button class="btn btn-primary btn-sm" (click)="sendChat()">Send</button>
+        </div>
+      </div>
+    } @else {
+      <div class="no-selection">Select a submission to review</div>
+    }
+  </main>
+</div>

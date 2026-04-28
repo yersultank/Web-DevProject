@@ -1,0 +1,53 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">👥 Students</h1>
+    <button class="btn btn-primary" (click)="showModal=true">+ Add Student</button>
+  </div>
+
+  <input class="input" style="max-width:320px;margin-bottom:20px" [(ngModel)]="search" placeholder="Search by name or username…" />
+
+  <div class="students-grid">
+    @for (s of filtered; track s.id) {
+      <div class="student-card card" (click)="open(s.id)">
+        <div class="student-avatar">{{ initials(s) }}</div>
+        <div class="student-info">
+          <div class="student-name">{{ s.full_name || s.username }}</div>
+          <div class="student-username">@{{ s.username }}</div>
+          <div class="student-stats">
+            <span>📝 {{ s.submitted }}/{{ s.total }}</span>
+            <span>⭐ {{ s.avg_score ?? '—' }}/100</span>
+            @if (s.overdue > 0) { <span style="color:var(--danger)">⚠ {{ s.overdue }} overdue</span> }
+          </div>
+        </div>
+      </div>
+    }
+    @if (!filtered.length) {
+      <div style="color:var(--text-muted);font-size:14px">No students found.</div>
+    }
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-title">+ Add Student</div>
+      @if (createError) { <div style="color:var(--danger);font-size:13px;margin-bottom:12px">{{ createError }}</div> }
+      <div class="form-group">
+        <label class="label">Username</label>
+        <input class="input" [(ngModel)]="newUsername" placeholder="student_username" />
+      </div>
+      <div class="form-group">
+        <label class="label">Password</label>
+        <input class="input" type="password" [(ngModel)]="newPassword" />
+      </div>
+      <div class="form-group">
+        <label class="label">Full Name (optional)</label>
+        <input class="input" [(ngModel)]="newFullName" placeholder="John Doe" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" (click)="showModal=false">Cancel</button>
+        <button class="btn btn-primary" [disabled]="creating" (click)="create()">{{ creating ? 'Creating…' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,81 @@
+<div class="page">
+  <div class="page-header"><h1 class="page-title">⚙️ Settings</h1></div>
+
+  @if (settings) {
+    <!-- Toxic Admin -->
+    <div class="card settings-section" style="max-width:640px;margin-bottom:20px">
+      <h3 class="section-title">Toxic Admin System</h3>
+
+      <div class="toggle-row">
+        <span class="toggle-label">System Enabled</span>
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="settings.enabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Trigger on tab leave</span>
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="settings.trigger_tab_leave" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Trigger on late submit</span>
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="settings.trigger_late_submit" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:16px" [disabled]="saving" (click)="saveSettings()">
+        {{ saving ? 'Saving…' : 'Save Settings' }}
+      </button>
+    </div>
+
+    <!-- Tab Leave Messages -->
+    <div class="card settings-section" style="max-width:640px;margin-bottom:16px">
+      <h3 class="section-title">Tab Leave Messages</h3>
+      @for (msg of tabLeaveMessages(); track msg.id) {
+        <div class="msg-row">
+          @if (editingId === msg.id) {
+            <input class="input" [(ngModel)]="editingText" style="flex:1" />
+            <button class="btn btn-primary btn-sm" (click)="saveEdit(msg.id)">Save</button>
+            <button class="btn btn-ghost btn-sm" (click)="editingId=null">Cancel</button>
+          } @else {
+            <span class="msg-text">{{ msg.text }}</span>
+            <button class="btn btn-ghost btn-sm" (click)="startEdit(msg)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteMsg(msg.id)">✕</button>
+          }
+        </div>
+      }
+      <div class="add-msg-row">
+        <input class="input" [(ngModel)]="newMsgText" placeholder="Add tab leave message…" (keydown.enter)="newMsgTrigger='tab_leave'; addMessage()" style="flex:1" />
+        <button class="btn btn-ghost btn-sm" (click)="newMsgTrigger='tab_leave'; addMessage()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Late Submit Messages -->
+    <div class="card settings-section" style="max-width:640px">
+      <h3 class="section-title">Late Submit Messages</h3>
+      @for (msg of lateSubmitMessages(); track msg.id) {
+        <div class="msg-row">
+          @if (editingId === msg.id) {
+            <input class="input" [(ngModel)]="editingText" style="flex:1" />
+            <button class="btn btn-primary btn-sm" (click)="saveEdit(msg.id)">Save</button>
+            <button class="btn btn-ghost btn-sm" (click)="editingId=null">Cancel</button>
+          } @else {
+            <span class="msg-text">{{ msg.text }}</span>
+            <button class="btn btn-ghost btn-sm" (click)="startEdit(msg)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteMsg(msg.id)">✕</button>
+          }
+        </div>
+      }
+      <div class="add-msg-row">
+        <input class="input" [(ngModel)]="newMsgText" placeholder="Add late submit message…" (keydown.enter)="newMsgTrigger='late_submit'; addMessage()" style="flex:1" />
+        <button class="btn btn-ghost btn-sm" (click)="newMsgTrigger='late_submit'; addMessage()">+ Add</button>
+      </div>
+    </div>
+  } @else {
+    <div style="color:var(--text-muted)">Loading…</div>
+  }
+</div>

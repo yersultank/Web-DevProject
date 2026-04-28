@@ -1,0 +1,59 @@
+<div class="page">
+  <div class="page-header"><h1 class="page-title">📊 Dashboard</h1></div>
+
+  @if (data) {
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">👥 Students</div>
+        <div class="stat-value">{{ data.student_count }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">✅ Total Submissions</div>
+        <div class="stat-value">{{ data.submitted_count }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">⏳ Pending Review</div>
+        <div class="stat-value" [style.color]="data.pending_count > 0 ? 'var(--warning)' : ''">{{ data.pending_count }}</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card chart-card">
+        <h3 class="section-title">Submissions — last 7 days</h3>
+        <canvas #chartCanvas width="560" height="200"></canvas>
+      </div>
+
+      <div class="side-panels">
+        <div class="card" style="margin-bottom:16px">
+          <h3 class="section-title">Recent Submissions</h3>
+          @for (s of data.recent_submissions; track s.id) {
+            <div class="list-row" (click)="openSubmission(s.id)">
+              <div class="list-main">
+                <span class="list-name">{{ s.student_name }}</span>
+                <span class="list-sub">{{ s.assignment_title }}</span>
+              </div>
+              <div class="list-right">
+                <span class="list-date">{{ s.submitted_at | date:'dd MMM' }}</span>
+                @if (s.is_late) { <span class="badge badge-late">Late</span> }
+              </div>
+            </div>
+          }
+          @if (!data.recent_submissions.length) { <div class="empty">No recent submissions.</div> }
+        </div>
+
+        <div class="card">
+          <h3 class="section-title">Overdue Students</h3>
+          @for (s of data.overdue_students; track s.id) {
+            <div class="list-row" (click)="openStudent(s.id)">
+              <span class="list-name">{{ s.name }}</span>
+              <span class="badge badge-overdue">{{ s.count }} overdue</span>
+            </div>
+          }
+          @if (!data.overdue_students.length) { <div class="empty">No overdue students 🎉</div> }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div style="color:var(--text-muted);padding:40px 0">Loading dashboard…</div>
+  }
+</div>

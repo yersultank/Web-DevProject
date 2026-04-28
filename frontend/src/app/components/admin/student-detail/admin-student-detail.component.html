@@ -1,0 +1,67 @@
+<div class="page">
+  <button class="btn btn-ghost btn-sm" style="margin-bottom:20px" routerLink="/admin/students">← Back</button>
+
+  @if (student) {
+    <div class="student-header">
+      <div class="avatar-large">{{ initials(student.full_name || student.username) }}</div>
+      <div>
+        <h1 class="page-title">{{ student.full_name || student.username }}</h1>
+        <div style="color:var(--text-muted);font-size:14px">@{{ student.username }}</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Submitted</div><div class="stat-value">{{ student.submitted }}/{{ student.total }}</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Score</div><div class="stat-value">{{ student.avg_score ?? '—' }}</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value" [style.color]="student.overdue>0?'var(--danger)':''">{{ student.overdue }}</div></div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Submissions table -->
+      <div class="card">
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px">Assignment History</h3>
+        <table class="sub-table">
+          <thead>
+            <tr><th>Assignment</th><th>Score</th><th>Submitted</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            @for (s of student.submissions; track s.id) {
+              <tr (click)="openSubmission(s.id)" class="clickable-row">
+                <td>{{ s.assignment?.title }}</td>
+                <td>{{ s.score ?? '—' }}</td>
+                <td>{{ s.submitted_at | date:'dd MMM, HH:mm' }}</td>
+                <td>
+                  <span class="badge badge-{{ s.status }}">{{ s.status }}</span>
+                  @if (s.is_late) { <span class="badge badge-late" style="margin-left:4px">Late</span> }
+                </td>
+              </tr>
+            }
+            @if (!student.submissions.length) {
+              <tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px">No submissions yet.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Chat panel -->
+      <div class="card chat-panel">
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px">💬 Chat</h3>
+        <div class="chat-messages">
+          @for (m of messages; track m.id) {
+            <div class="chat-msg" [class.own]="m.sender_id === adminId">
+              <div class="msg-bubble">{{ m.text }}</div>
+              <div class="msg-time">{{ m.created_at | date:'HH:mm' }}</div>
+            </div>
+          }
+          @if (!messages.length) { <div style="color:var(--text-muted);font-size:13px">No messages yet.</div> }
+        </div>
+        <div class="chat-input-row">
+          <input class="input" [(ngModel)]="chatText" placeholder="Type a message…" (keydown.enter)="send()" />
+          <button class="btn btn-primary btn-sm" (click)="send()">Send</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div style="color:var(--text-muted)">Loading…</div>
+  }
+</div>
